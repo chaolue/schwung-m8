@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M8 Songs &amp; Knobs</title>
+<style>
+:root{
+  --bg:#0c0c0e; --card:#17171a; --card-hi:#212126; --sunk:#101013;
+  --text:#e6e4eb; --muted:#9d9ba3; --faint:#6f6d76;
+  --accent:#e8a84c; --accent-dim:#b87a30;
+  --blue:#5b8def; --border:#28272e;
+  --ok:#5ab8a6; --warn:#e8a84c; --bad:#ff9a92;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;padding:20px;background:var(--bg);color:var(--text);
+  font:15px/1.55 "Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+h1{font-size:1.35rem;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 18px;max-width:74ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 16px;
+     position:sticky;top:0;background:var(--bg);padding:6px 0;z-index:5}
+button{
+  font:inherit;font-size:13.5px;padding:6px 12px;border-radius:6px;
+  border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;
+}
+button:hover:not(:disabled){background:var(--card-hi)}
+button:disabled{opacity:.35;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:#1a1205;font-weight:600}
+button.primary:hover:not(:disabled){background:var(--accent-dim)}
+button.icon{padding:4px 9px;font-family:var(--mono);line-height:1.2}
+button.danger{color:var(--bad);border-color:#4a2422}
+button.danger:hover:not(:disabled){background:#2a1614}
+.status{margin-left:auto;font-size:13px;color:var(--muted);font-family:var(--mono)}
+.status.ok{color:var(--ok)} .status.err{color:var(--bad)} .status.dirty{color:var(--accent)}
+
+ol.songs{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:10px}
+li.song{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+li.song.active{border-color:var(--accent-dim)}
+.songhead{display:grid;gap:10px;grid-template-columns:auto 1fr auto;align-items:center}
+.slot{
+  font-family:var(--mono);font-size:11px;width:52px;height:34px;border-radius:6px;
+  display:grid;place-items:center;border:1px solid var(--border);background:var(--sunk);color:var(--muted);
+}
+.slot.lit{background:rgba(232,168,76,.14);border-color:var(--accent-dim);color:var(--accent)}
+.name{display:flex;flex-direction:column;gap:3px;min-width:0}
+input,select{
+  font:inherit;font-size:14px;padding:5px 8px;border-radius:5px;
+  border:1px solid var(--border);background:var(--sunk);color:var(--text);
+}
+input:focus,select:focus{outline:2px solid var(--blue);outline-offset:1px}
+.name input{max-width:26rem;width:100%}
+.meta{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+.acts{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.badge{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;background:rgba(232,168,76,.14);
+  color:var(--accent);border:1px solid var(--accent-dim);margin-left:8px;
+}
+
+.knobs{margin:12px 0 2px;border-top:1px solid var(--border);padding-top:10px}
+.pagehead{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+          color:var(--faint);margin:10px 0 6px}
+.grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
+.knob{background:var(--sunk);border:1px solid var(--border);border-radius:7px;padding:8px 9px;
+      display:flex;flex-direction:column;gap:6px;min-width:0}
+.knob.empty{border-style:dashed;align-items:flex-start;justify-content:center;min-height:104px}
+.knob .top{display:flex;gap:6px;align-items:center}
+.knob .top .n{font-family:var(--mono);font-size:10.5px;color:var(--faint);width:14px;flex:none}
+.knob .top input{flex:1;min-width:0;font-family:var(--mono);font-size:13px}
+.row2{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.row2 label{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+.row2 input.cc{width:4.2rem;font-family:var(--mono)}
+.row2 select{font-size:12.5px;padding:3px 5px}
+.conn{font-family:var(--mono);font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conn.none{color:var(--faint);font-style:italic}
+.knob .foot{display:flex;gap:5px;align-items:center;justify-content:space-between}
+.lock{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+.dupe{color:var(--bad);border-color:#5a2a26 !important}
+.note{border-left:3px solid var(--border);padding:8px 12px;margin:0 0 16px;
+      color:var(--muted);font-size:13px;max-width:82ch}
+.empty-list{color:var(--muted);font-style:italic;padding:14px 0}
+@media (max-width:560px){
+  .songhead{grid-template-columns:auto 1fr}
+  .acts{grid-column:1 / -1;justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<h1>M8 Songs &amp; Knobs</h1>
+<p class="sub">The song bank for the M8 LPP Emulator. Position in this list is the step
+button that recalls a song — the first eight sit on the eight preset steps. Open a song to
+edit its knobs. Changes are written to the device and a running module picks them up within
+a couple of seconds.</p>
+
+<div class="bar">
+  <button id="add">+ Add song</button>
+  <button id="reload">Reload from device</button>
+  <button id="save" class="primary" disabled>Save changes</button>
+  <span id="status" class="status">Loading…</span>
+</div>
+
+<p class="note">Only slots that hold a knob are listed; each page ends with a tile for the
+next free one. <strong>SPD</strong> is how far one detent moves the value, counted in CC steps
+— 1/2x is what walks a hex knob through every byte — and <strong>MIN/MAX</strong> are the ends
+of its travel, written in whatever the knob reads in. A knob's <strong>connection</strong> — which M8 parameter it stands for — is
+chosen from the catalogue on the Move, and so is the picture a group of knobs draws. Both are
+shown here and carried through untouched. What this page edits is the name, the CC, the send
+mode and the value display, plus adding, removing and moving between slots.</p>
+
+<p class="note"><strong>Absolute</strong> is the send mode the M8 reads: it learns a CC and takes
+the value as sent. <strong>Relative</strong> sends the movement instead and does nothing on the
+M8 — it is there for other gear sharing the wire.</p>
+
+<ol class="songs" id="list"></ol>
+
+<script>
+"use strict";
+
+var MODULE_DIR = "/data/UserData/schwung/modules/overtake/m8";
+/* Absolute, so the page works wherever it is opened from. */
+var READ_URL = "/api/remote-ui/module-assets/m8/songs.json";
+var UPLOAD_URL = "/files/upload";
+
+var MODES = ["Absolute", "Relative"];
+var DISPLAYS = ["0-127", "Hex", "0-1", "-1..1", "dB", "Q", "Hz"];
+/* The last three read a knob the way M8's EQ editor does. Kept in step
+ * with KNOB_DISPLAY_OPTIONS in ui.js - the stored value is the INDEX. */
+var MULTS = ["1/4x", "1/3x", "1/2x", "1x", "2x"];
+var SWEEPS = ["Neutral", "Synthwave", "Rose", "Rainbow", "Off"];
+var MULT_DEFAULT = 3;
+var SLOTS_PER_PAGE = 8;
+
+/* A knob set to Hex counts in M8 BYTES, 0-255, and sends value >> 1;
+ * every other display counts in CC steps, 0-127. */
+function fineHex(knob) { return knob.display === 1 && knob.scale !== 0x7F; }
+function maxStep(knob) { return fineHex(knob) ? 255 : 127; }
+function limitLow(knob) { return typeof knob.min === "number" ? knob.min : 0; }
+function limitHigh(knob) { return typeof knob.max === "number" ? knob.max : maxStep(knob); }
+/* Hex knobs read in hex, so the boxes do too. */
+function showStep(knob, v) {
+    return fineHex(knob) ? v.toString(16).toUpperCase() : String(v);
+}
+function parseStep(knob, text) {
+    var v = parseInt(text, fineHex(knob) ? 16 : 10);
+    return isNaN(v) ? null : Math.max(0, Math.min(maxStep(knob), v));
+}
+
+var doc = null;
+var dirty = false;
+var open = {};          /* song id -> knobs expanded */
+
+function csrfToken() {
+    var m = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+    return m ? decodeURIComponent(m[1]) : "";
+}
+
+function setStatus(text, kind) {
+    var el = document.getElementById("status");
+    el.textContent = text;
+    el.className = "status" + (kind ? " " + kind : "");
+}
+
+function markDirty() {
+    dirty = true;
+    document.getElementById("save").disabled = false;
+    setStatus("Unsaved changes", "dirty");
+}
+
+function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+}
+
+function button(label, title, disabled, onClick, cls) {
+    var b = el("button", "icon" + (cls ? " " + cls : ""), label);
+    b.title = title;
+    b.disabled = !!disabled;
+    b.addEventListener("click", onClick);
+    return b;
+}
+
+/* ---------------------------------------------------------------- knobs */
+
+function eachKnob(song, fn) {
+    (song.pages || []).forEach(function (page, pi) {
+        (page.knobs || []).forEach(function (knob, si) {
+            if (knob) fn(knob, pi, si);
+        });
+    });
+}
+
+function knobCount(song) {
+    var n = 0;
+    eachKnob(song, function () { n++; });
+    return n;
+}
+
+function nextFreeCc(song) {
+    var used = {};
+    eachKnob(song, function (k) { used[k.cc] = true; });
+    for (var cc = 1; cc <= 127; cc++) if (!used[cc]) return cc;
+    return 1;
+}
+
+function duplicateCcs(song) {
+    var seen = {}, dupes = {};
+    eachKnob(song, function (k) {
+        if (seen[k.cc]) dupes[k.cc] = true;
+        seen[k.cc] = true;
+    });
+    return dupes;
+}
+
+/* A knob that belongs to a picture cannot be moved on its own: the group
+ * has to stay side by side on one row, which is a rule the module
+ * enforces when it moves one. So grouped knobs are reorderable only on
+ * the Move. */
+function groupOf(knob) {
+    return knob && knob.viz && knob.viz.group ? knob.viz.group : null;
+}
+
+/* Only the slots that HOLD something are drawn. Eight dashed boxes per
+ * page is mostly empty space once a song has a spare page or two, and
+ * the empty ones carry nothing to read. Adding is one tile at the end
+ * of each page that has room, rather than one per hole.
+ *
+ * The slot NUMBER stays on every card, because it is not decoration:
+ * slot 3 is the third encoder under your hand. */
+function renderKnobs(song) {
+    var wrap = el("div", "knobs");
+    var dupes = duplicateCcs(song);
+
+    (song.pages || []).forEach(function (page, pi) {
+        var knobs = page.knobs || [];
+        var filled = [];
+        for (var si = 0; si < SLOTS_PER_PAGE; si++) if (knobs[si]) filled.push(si);
+        var free = firstFreeSlot(page);
+
+        wrap.appendChild(el("div", "pagehead",
+            "Page " + (pi + 1) + " of " + song.pages.length +
+            (filled.length ? "" : " — empty")));
+
+        var grid = el("div", "grid");
+        filled.forEach(function (si) {
+            grid.appendChild(renderSlot(song, page, pi, si, dupes));
+        });
+        if (free >= 0) grid.appendChild(renderAddTile(song, page, free));
+        wrap.appendChild(grid);
+    });
+
+    /* Every page full means there is nowhere for the tile above to go -
+     * and a song whose knob count is an exact multiple of eight hits
+     * that every time. A knob added here starts a page, which is what
+     * the module does on the device when a page fills up. */
+    if (!songHasFreeSlot(song)) {
+        wrap.appendChild(el("div", "pagehead", "Every page is full"));
+        var last = el("div", "grid");
+        last.appendChild(renderNewPageTile(song));
+        wrap.appendChild(last);
+    }
+    return wrap;
+}
+
+function songHasFreeSlot(song) {
+    return (song.pages || []).some(function (page) { return firstFreeSlot(page) >= 0; });
+}
+
+function emptyPage() {
+    return { knobs: [null, null, null, null, null, null, null, null] };
+}
+
+function newKnob(song) {
+    /* Hex, so it counts in bytes - 0x80 is the middle of that travel. */
+    return {
+        name: "KNB",
+        cc: nextFreeCc(song),
+        value: 128,
+        default: 128,
+        mode: 0,
+        display: 1,
+        mult: MULT_DEFAULT
+    };
+}
+
+function renderNewPageTile(song) {
+    var box = el("div", "knob empty");
+    box.appendChild(el("div", "lock", "Page " + ((song.pages || []).length + 1)));
+    box.appendChild(button("+ Add knob on a new page",
+                           "Start another page of eight and put a knob on its first slot",
+                           false, function () {
+        var page = emptyPage();
+        page.knobs[0] = newKnob(song);
+        song.pages.push(page);
+        markDirty();
+        render();
+    }));
+    box.appendChild(el("div", "conn none", "no connection — set one on the Move"));
+    return box;
+}
+
+function firstFreeSlot(page) {
+    var knobs = page.knobs || [];
+    for (var si = 0; si < SLOTS_PER_PAGE; si++) if (!knobs[si]) return si;
+    return -1;
+}
+
+function renderAddTile(song, page, slot) {
+    var box = el("div", "knob empty");
+    box.appendChild(el("div", "lock", "Slot " + (slot + 1) + " is free"));
+    box.appendChild(button("+ Add knob", "Put a knob on encoder " + (slot + 1), false, function () {
+        page.knobs[slot] = newKnob(song);
+        markDirty();
+        render();
+    }));
+    box.appendChild(el("div", "conn none", "no connection — set one on the Move"));
+    return box;
+}
+
+/* Always called with a knob: renderKnobs skips the empty slots. */
+function renderSlot(song, page, pi, si, dupes) {
+    var knob = page.knobs[si];
+    var card = el("div", "knob");
+
+    var top = el("div", "top");
+    top.appendChild(el("span", "n", String(si + 1)));
+    var name = document.createElement("input");
+    name.type = "text";
+    name.value = knob.name || "";
+    name.maxLength = 8;
+    name.setAttribute("aria-label", "Knob name");
+    name.addEventListener("input", function () { knob.name = name.value; markDirty(); });
+    top.appendChild(name);
+    card.appendChild(top);
+
+    var row = el("div", "row2");
+    row.appendChild(el("label", null, "CC"));
+    var cc = document.createElement("input");
+    cc.type = "number";
+    cc.className = "cc" + (dupes[knob.cc] ? " dupe" : "");
+    cc.min = 1; cc.max = 127;
+    cc.value = knob.cc;
+    cc.title = dupes[knob.cc]
+        ? "Another knob in this song sends the same CC — the M8 learns one parameter per CC"
+        : "The CC this knob sends. The M8 learns it on the device.";
+    cc.addEventListener("input", function () {
+        var v = parseInt(cc.value, 10);
+        if (!isNaN(v) && v >= 1 && v <= 127) { knob.cc = v; markDirty(); }
+    });
+    cc.addEventListener("change", render);
+    row.appendChild(cc);
+
+    /* Which channel this knob sends on. "Song" is the usual answer -
+     * the one in Settings - and a knob only carries its own when it is
+     * pointed at something that is not the M8. */
+    var chan = document.createElement("select");
+    var follow = document.createElement("option");
+    follow.value = ""; follow.textContent = "Ch: Song";
+    chan.appendChild(follow);
+    for (var c = 0; c < 16; c++) {
+        var co = document.createElement("option");
+        co.value = String(c); co.textContent = "Ch " + (c + 1);
+        chan.appendChild(co);
+    }
+    chan.value = typeof knob.chan === "number" ? String(knob.chan) : "";
+    chan.title = "MIDI channel. Song follows the one in Settings.";
+    chan.addEventListener("change", function () {
+        if (chan.value === "") delete knob.chan;
+        else knob.chan = parseInt(chan.value, 10);
+        markDirty();
+    });
+    row.appendChild(chan);
+
+    var mode = document.createElement("select");
+    MODES.forEach(function (label, i) {
+        var o = document.createElement("option");
+        o.value = String(i); o.textContent = label;
+        mode.appendChild(o);
+    });
+    mode.value = String(knob.mode || 0);
+    mode.title = "Absolute sends the value - the only mode the M8 reads. " +
+                 "Relative sends the movement, for other gear on the wire.";
+    mode.addEventListener("change", function () { knob.mode = parseInt(mode.value, 10); markDirty(); });
+    row.appendChild(mode);
+
+    var disp = document.createElement("select");
+    DISPLAYS.forEach(function (label, i) {
+        var o = document.createElement("option");
+        o.value = String(i); o.textContent = label;
+        disp.appendChild(o);
+    });
+    disp.value = String(knob.display === undefined ? 1 : knob.display);
+    disp.title = "How its value reads on the Move's screen";
+    disp.addEventListener("change", function () {
+        /* 7F on a 0-127 knob and 7F on a hex one are opposite ends of
+         * the travel, so the position is re-expressed rather than kept
+         * as a number - the same conversion the module does. */
+        var wasFine = fineHex(knob);
+        knob.display = parseInt(disp.value, 10);
+        var isFine = fineHex(knob);
+        if (wasFine !== isFine) {
+            var conv = function (v) {
+                return Math.max(0, Math.min(isFine ? 255 : 127,
+                                            isFine ? v * 2 : Math.round(v / 2)));
+            };
+            knob.value = conv(knob.value);
+            if (typeof knob.default === "number") knob.default = conv(knob.default);
+            if (typeof knob.min === "number") knob.min = conv(knob.min);
+            if (typeof knob.max === "number") knob.max = conv(knob.max);
+        }
+        markDirty();
+        render();
+    });
+    row.appendChild(disp);
+    card.appendChild(row);
+
+    var row3 = el("div", "row2");
+    row3.appendChild(el("label", null, "SPD"));
+    var mult = document.createElement("select");
+    MULTS.forEach(function (label, i) {
+        var o = document.createElement("option");
+        o.value = String(i); o.textContent = label;
+        mult.appendChild(o);
+    });
+    mult.value = String(typeof knob.mult === "number" ? knob.mult : MULT_DEFAULT);
+    mult.title = "How far one detent moves it, counted in CC steps. " +
+                 "1/2x is what walks a hex knob through every byte.";
+    mult.addEventListener("change", function () {
+        knob.mult = parseInt(mult.value, 10);
+        markDirty();
+    });
+    row3.appendChild(mult);
+
+    row3.appendChild(el("label", null, "LED"));
+    var led = document.createElement("select");
+    var ledFollow = document.createElement("option");
+    ledFollow.value = ""; ledFollow.textContent = "Song";
+    led.appendChild(ledFollow);
+    SWEEPS.forEach(function (label, i) {
+        var o = document.createElement("option");
+        o.value = String(i); o.textContent = label;
+        led.appendChild(o);
+    });
+    led.value = typeof knob.led === "number" ? String(knob.led) : "";
+    led.title = "Colour sweep for the light under this knob. Song follows the one in Settings.";
+    led.addEventListener("change", function () {
+        if (led.value === "") delete knob.led;
+        else knob.led = parseInt(led.value, 10);
+        markDirty();
+    });
+    row3.appendChild(led);
+
+    row3.appendChild(el("label", null, fineHex(knob) ? "MIN/MAX HEX" : "MIN/MAX"));
+    row3.appendChild(limitBox(knob, "min"));
+    row3.appendChild(limitBox(knob, "max"));
+    card.appendChild(row3);
+
+    var conn = el("div", "conn" + (knob.detail ? "" : " none"),
+                  knob.detail || "no connection recorded");
+    conn.title = knob.detail
+        ? "What this knob stands for on the M8 — set on the device"
+        : "Set a connection from the Move: jog click, land on the knob, click, then Connect";
+    card.appendChild(conn);
+
+    var foot = el("div", "foot");
+    var grouped = groupOf(knob);
+    if (grouped) {
+        var kind = (knob.viz.kind || "graphic") + " · " + (knob.viz.role || "");
+        foot.appendChild(el("span", "lock", kind.trim()));
+    } else {
+        var moves = el("span", null, "");
+        moves.appendChild(button("←", "Move to the slot before", si === 0, function () {
+            swapSlots(song, page, si, si - 1);
+        }));
+        moves.appendChild(button("→", "Move to the slot after", si === SLOTS_PER_PAGE - 1, function () {
+            swapSlots(song, page, si, si + 1);
+        }));
+        foot.appendChild(moves);
+    }
+    foot.appendChild(button("Remove", "Clear this slot", false, function () {
+        if (!window.confirm("Remove “" + (knob.name || "this knob") + "”?")) return;
+        page.knobs[si] = null;
+        markDirty();
+        render();
+    }, "danger"));
+    card.appendChild(foot);
+
+    return card;
+}
+
+/* An end of the travel. Blank means "no limit", which is what every
+ * knob made before these existed has. */
+function limitBox(knob, which) {
+    var box = document.createElement("input");
+    box.type = "text";
+    box.className = "cc";
+    box.value = showStep(knob, which === "min" ? limitLow(knob) : limitHigh(knob));
+    box.title = which === "min" ? "Lowest value this knob can reach"
+                                : "Highest value this knob can reach";
+    box.addEventListener("change", function () {
+        var v = parseStep(knob, box.value);
+        if (v === null) { box.value = showStep(knob, which === "min" ? limitLow(knob) : limitHigh(knob)); return; }
+        if (which === "min") knob.min = Math.min(v, limitHigh(knob));
+        else knob.max = Math.max(v, limitLow(knob));
+        /* A value outside its own travel makes no sense. */
+        knob.value = Math.max(limitLow(knob), Math.min(limitHigh(knob), knob.value));
+        markDirty();
+        render();
+    });
+    return box;
+}
+
+/* Only ever called for an ungrouped knob, and it refuses to displace a
+ * grouped one - a picture's knobs have to stay side by side. */
+function swapSlots(song, page, a, b) {
+    var other = page.knobs[b];
+    if (other && groupOf(other)) {
+        window.alert("That slot belongs to a picture, which has to stay together. " +
+                     "Move it on the Move instead.");
+        return;
+    }
+    var tmp = page.knobs[a];
+    page.knobs[a] = other || null;
+    page.knobs[b] = tmp;
+    markDirty();
+    render();
+}
+
+/* ---------------------------------------------------------------- songs */
+
+function render() {
+    var list = document.getElementById("list");
+    list.textContent = "";
+    if (!doc || !doc.songs || !doc.songs.length) {
+        list.appendChild(el("li", "empty-list", "No songs on the device yet."));
+        return;
+    }
+
+    doc.songs.forEach(function (song, i) {
+        var li = el("li", "song" + (song.id === doc.activeSongId ? " active" : ""));
+        var head = el("div", "songhead");
+
+        var slot = el("div", "slot" + (i < 8 ? " lit" : ""), i < 8 ? "STEP " + (i + 1) : "—");
+        slot.title = i < 8
+            ? "Recalled by preset step " + (i + 1)
+            : "Past the eight preset steps — reachable from Settings > Songs on the device";
+        head.appendChild(slot);
+
+        var name = el("div", "name");
+        var input = document.createElement("input");
+        input.type = "text";
+        input.value = song.name || "";
+        input.maxLength = 32;
+        input.setAttribute("aria-label", "Song name");
+        input.addEventListener("input", function () { song.name = input.value; markDirty(); });
+        name.appendChild(input);
+
+        var meta = el("div", "meta");
+        var pages = (song.pages || []).length;
+        meta.appendChild(el("span", null,
+            pages + (pages === 1 ? " page, " : " pages, ") +
+            knobCount(song) + (knobCount(song) === 1 ? " knob" : " knobs")));
+        if (song.id === doc.activeSongId) meta.appendChild(el("span", "badge", "Active"));
+        name.appendChild(meta);
+        head.appendChild(name);
+
+        var acts = el("div", "acts");
+        acts.appendChild(button(open[song.id] ? "Hide knobs" : "Edit knobs",
+                                "Show this song's pages and knobs", false, function () {
+            open[song.id] = !open[song.id];
+            render();
+        }));
+        acts.appendChild(button("↑", "Move up a step", i === 0, function () { swapSongs(i, i - 1); }));
+        acts.appendChild(button("↓", "Move down a step", i === doc.songs.length - 1,
+                                function () { swapSongs(i, i + 1); }));
+        acts.appendChild(button("Make active", "Switch the module to this song",
+                                song.id === doc.activeSongId, function () {
+            doc.activeSongId = song.id;
+            markDirty();
+            render();
+        }));
+        acts.appendChild(button("Delete", "Remove this song and its knobs",
+                                doc.songs.length < 2, function () {
+            if (!window.confirm("Delete “" + (song.name || "this song") + "” and its knobs?")) return;
+            doc.songs.splice(i, 1);
+            if (doc.activeSongId === song.id) doc.activeSongId = doc.songs[0].id;
+            markDirty();
+            render();
+        }, "danger"));
+        head.appendChild(acts);
+
+        li.appendChild(head);
+        if (open[song.id]) li.appendChild(renderKnobs(song));
+        list.appendChild(li);
+    });
+}
+
+function swapSongs(a, b) {
+    var tmp = doc.songs[a];
+    doc.songs[a] = doc.songs[b];
+    doc.songs[b] = tmp;
+    markDirty();
+    render();
+}
+
+function newSongId() {
+    return "web" + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
+}
+
+document.getElementById("add").addEventListener("click", function () {
+    if (!doc) return;
+    doc.songs.push({ id: newSongId(), name: "New Song", pages: [emptyPage()] });
+    markDirty();
+    render();
+});
+
+document.getElementById("reload").addEventListener("click", function () {
+    if (dirty && !window.confirm("Discard your unsaved changes and reload from the device?")) return;
+    load();
+});
+
+document.getElementById("save").addEventListener("click", save);
+
+function load() {
+    setStatus("Loading…");
+    fetch(READ_URL + "?t=" + Date.now(), { cache: "no-store" })
+        .then(function (r) {
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return r.json();
+        })
+        .then(function (json) {
+            doc = json;
+            if (!Array.isArray(doc.songs)) doc.songs = [];
+            dirty = false;
+            document.getElementById("save").disabled = true;
+            render();
+            setStatus(doc.songs.length + (doc.songs.length === 1 ? " song" : " songs"), "ok");
+        })
+        .catch(function (e) {
+            setStatus("Could not read songs.json — " + e.message, "err");
+        });
+}
+
+function save() {
+    if (!doc) return;
+    setStatus("Saving…");
+    var body = new Blob([JSON.stringify(doc)], { type: "application/json" });
+    var form = new FormData();
+    form.append("path", MODULE_DIR);
+    form.append("file", new File([body], "songs.json", { type: "application/json" }));
+    fetch(UPLOAD_URL, {
+        method: "POST",
+        headers: { "X-CSRF-Token": csrfToken() },
+        body: form
+    }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        dirty = false;
+        document.getElementById("save").disabled = true;
+        setStatus("Saved — the module picks it up within a couple of seconds", "ok");
+    }).catch(function (e) {
+        setStatus("Save failed — " + e.message, "err");
+    });
+}
+
+load();
+</script>
+</body>
+</html>

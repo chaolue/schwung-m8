@@ -17,8 +17,13 @@ mkdir -p dist/m8
 echo "Packaging..."
 cp src/module.json dist/m8/
 [ -f src/help.json ] && cp src/help.json dist/m8/
+# Schwung Manager renders the module's web Settings page from this, and
+# keeps the chosen values in a config.json it writes beside it.
+[ -f src/settings-schema.json ] && cp src/settings-schema.json dist/m8/
+# The Songs editor, served by the manager at
+# /api/remote-ui/module-assets/m8/web_ui.html
+[ -f src/web_ui.html ] && cp src/web_ui.html dist/m8/
 cp src/ui.js dist/m8/
-cp src/virtual_knobs.mjs dist/m8/
 
 # Create tarball for release
 cd dist

@@ -37,13 +37,24 @@ Manual installation:
 2. Launch M8 LPP Emulator module
 3. Configure M8 to use Launchpad Pro mode
 
+## Documentation
+
+Full documentation — the Launchpad Pro integration this module emulates, and
+the knobs, songs, graphics and web UI the Move adds — is
+[`docs/index.html`](docs/index.html): one self-contained page with no build
+step, ready to serve as a GitHub Pages site (Settings → Pages → Deploy from a
+branch → `main` → `/docs`).
+
+A condensed version lives on the device itself, at Global Settings → System →
+Module Help.
+
 ## Important: MIDI Channel Configuration
 
-The M8 LPP Emulator communicates on **MIDI channel 1**. To avoid conflicts:
+The M8 LPP Emulator communicates on **MIDI channel 1-3**. To avoid conflicts:
 
-- Set Move tracks to use **channel 2 or higher**
-- Set shadow mode slots to use **channel 2 or higher** (via receive/forward channel settings)
-- Do not configure Move tracks to listen on channel 1 and output to channel 1, as this creates MIDI echo that interferes with M8 communication
+- Set Move tracks to use **channel 4 or higher**
+- Set shadow mode slots to use **channel 4 or higher** (via receive/forward channel settings)
+- Do not configure Move tracks to listen on channel 1-3 and output to channel 1-3, as this creates MIDI echo that interferes with M8 communication
 
 This ensures M8's Launchpad Pro protocol doesn't trigger Move's synths or get echoed back.
 

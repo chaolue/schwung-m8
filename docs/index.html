@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Using an Ableton Move as a control surface for the Dirtywave M8: the Launchpad Pro integration the module emulates, and the knobs, songs and graphics the Move adds.">
+<meta name="color-scheme" content="light dark">
+<!-- The artifact host supplied these; a page served from Pages carries
+     its own. The page's own stylesheet does the rest. -->
+<style>img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Move M8 Control Surface</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --ground:#E7E8EA; --surface:#FFFFFF; --surface2:#F1F2F4;
+  --ink:#14161A; --ink2:#4A505C; --ink3:#787F8C;
+  --line:#D2D5DA; --line2:#BFC4CC;
+  --m8:#B75F14; --m8-soft:#F7E7D5; --m8-line:#E0BC92;
+  --move:#2B5987; --move-soft:#DCE7F2; --move-line:#A9C4DE;
+  --warn:#8A3A2E; --warn-soft:#F7E0DC;
+  --oled-bg:#0B1013; --oled-ink:#CFEDE3;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1216; --surface:#161A20; --surface2:#1D222A;
+    --ink:#E7EAEF; --ink2:#A7AEBB; --ink3:#79818F;
+    --line:#272D37; --line2:#343C48;
+    --m8:#E9A45A; --m8-soft:#38291A; --m8-line:#5C452A;
+    --move:#82B4E8; --move-soft:#15273A; --move-line:#2B435C;
+    --warn:#E08A7A; --warn-soft:#3A211C;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1216; --surface:#161A20; --surface2:#1D222A;
+  --ink:#E7EAEF; --ink2:#A7AEBB; --ink3:#79818F;
+  --line:#272D37; --line2:#343C48;
+  --m8:#E9A45A; --m8-soft:#38291A; --m8-line:#5C452A;
+  --move:#82B4E8; --move-soft:#15273A; --move-line:#2B435C;
+  --warn:#E08A7A; --warn-soft:#3A211C;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--body);font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 96px}
+
+header.top{padding:56px 0 36px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:0 0 14px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,6vw,4.1rem);line-height:.98;letter-spacing:-.025em;margin:0;text-wrap:balance}
+h1 .sub{display:block;color:var(--ink3);font-weight:600;font-size:.4em;letter-spacing:-.005em;margin-top:14px}
+.standfirst{max-width:62ch;color:var(--ink2);font-size:1.08rem;margin:22px 0 0}
+
+.cols{display:block}
+@media (min-width:1000px){
+  .cols{display:grid;grid-template-columns:212px 1fr;gap:56px;align-items:start}
+  nav.rail{position:sticky;top:28px;max-height:calc(100vh - 56px);overflow-y:auto}
+}
+nav.rail{padding-top:38px}
+nav.rail ul{list-style:none;margin:0 0 20px;padding:0;display:flex;flex-wrap:wrap;gap:2px 16px}
+@media (min-width:1000px){nav.rail ul{display:block}}
+nav.rail .part{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--m8);margin:0 0 6px;font-weight:600}
+nav.rail .grp{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:0 0 4px;font-weight:500}
+@media (max-width:999px){nav.rail .grp{width:100%}}
+nav.rail a{display:block;padding:3.5px 0;color:var(--ink2);text-decoration:none;font-size:13.5px;border-bottom:1px solid transparent}
+nav.rail a:hover{color:var(--m8);border-bottom-color:var(--m8-line)}
+
+main{min-width:0;padding-top:38px}
+section{margin:0 0 58px;scroll-margin-top:24px}
+.parthead{border-top:2px solid var(--ink);padding-top:14px;margin:0 0 40px}
+.parthead .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--m8);display:block;margin-bottom:4px}
+.parthead h2{font-size:2.1rem;margin:0 0 8px}
+.parthead p{color:var(--ink2);margin:0;max-width:64ch}
+h2{font-family:var(--display);font-weight:700;font-size:1.66rem;letter-spacing:-.017em;margin:0 0 6px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:700;font-size:1.04rem;letter-spacing:-.008em;margin:28px 0 8px}
+p{margin:0 0 14px;max-width:68ch}
+.lede{color:var(--ink2);margin-bottom:22px;max-width:68ch}
+a{color:var(--m8)}
+strong{font-weight:600}
+em{font-style:italic;color:var(--ink2)}
+ul.plain{margin:0 0 16px;padding-left:20px;max-width:68ch}
+ul.plain li{margin-bottom:6px}
+
+kbd{font-family:var(--mono);font-size:.83em;font-weight:500;white-space:nowrap;background:var(--surface);border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:1.5px 6px;color:var(--ink)}
+kbd.m8{background:var(--m8-soft);border-color:var(--m8-line);color:var(--m8)}
+code{font-family:var(--mono);font-size:.87em;background:var(--surface2);padding:1px 5px;border-radius:3px}
+.hx{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+.tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;padding:2px 7px;border-radius:3px;vertical-align:1px}
+.tag.move{background:var(--move-soft);color:var(--move);border:1px solid var(--move-line)}
+.tag.m8{background:var(--m8-soft);color:var(--m8);border:1px solid var(--m8-line)}
+.tag.new{background:var(--move-soft);color:var(--move);border:1px solid var(--move-line)}
+
+.scroll{overflow-x:auto;margin:0 0 18px;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);font-weight:500;padding:10px 14px;border-bottom:1px solid var(--line2);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.k{white-space:nowrap}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink2);white-space:nowrap}
+tbody tr:hover{background:var(--surface2)}
+
+.note{border-left:3px solid var(--m8);background:var(--m8-soft);padding:14px 18px;margin:0 0 18px;max-width:68ch}
+.note.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.note p{margin:0 0 8px}
+.note p:last-child{margin:0}
+.note .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--m8);margin:0 0 6px;font-weight:500}
+.note.warn .h{color:var(--warn)}
+
+.oled{background:var(--oled-bg);border:1px solid var(--line2);padding:14px;display:block;width:100%}
+/* A capture off the device's own panel. Held at 128x64 in the file and
+   scaled here, so the pixels stay square and the page stays light. */
+.shot{display:block;width:100%;height:auto;image-rendering:pixelated;
+      background:var(--oled-bg);border:1px solid var(--line2);padding:10px}
+figure{margin:0 0 20px}
+figcaption{font-size:13px;color:var(--ink3);margin-top:10px;max-width:66ch}
+.sheet{border:1px solid var(--line2);background:#fff;overflow-x:auto}
+.sheet img{display:block;min-width:1100px;width:100%;height:auto}
+
+.hero{display:grid;gap:26px;grid-template-columns:1fr;margin:34px 0 0;border:1px solid var(--line);background:var(--surface);padding:24px}
+@media (min-width:820px){.hero{grid-template-columns:1.25fr .9fr;align-items:center}}
+.callouts{display:flex;flex-direction:column}
+.callout{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.callout:last-child{border-bottom:none}
+.callout .pin{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--oled-ink);background:var(--oled-bg);width:20px;height:20px;border-radius:50%;display:grid;place-items:center;margin-top:2px}
+.callout b{font-family:var(--display);font-size:.95rem;display:block;letter-spacing:-.005em}
+.callout span{font-size:13.5px;color:var(--ink2);display:block}
+
+.pads{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;max-width:380px;margin:0 0 8px}
+.pads div{aspect-ratio:1;border:1px solid var(--line2);background:var(--surface2);border-radius:2px;display:grid;place-items:center;font-family:var(--mono);font-size:9.5px;color:var(--ink3)}
+.pads div.on{background:var(--move-soft);border-color:var(--move-line);color:var(--move);font-weight:600}
+.viewkey{font-size:13px;color:var(--ink2);margin:0 0 22px;max-width:40ch}
+.screenrow{display:grid;gap:20px;grid-template-columns:1fr}
+@media (min-width:680px){.screenrow.two{grid-template-columns:1fr 1fr}}
+
+table.wizard td:first-child{border-right:1px solid var(--line)}
+table.wizard tbody tr:hover{background:transparent}
+table.wizard tbody tr td:nth-child(2){font-family:var(--mono);font-size:13px;white-space:nowrap}
+.sub2{color:var(--ink3);font-size:12px;font-weight:400;display:block;margin-top:2px;white-space:normal;max-width:22ch}
+
+footer{border-top:2px solid var(--ink);margin-top:72px;padding:24px 0 0;color:var(--ink3);font-size:13px}
+footer p{max-width:70ch}
+:focus-visible{outline:2px solid var(--m8);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">Ableton Move · Schwung overtake module</p>
+  <h1>Move as an M8<br>Control Surface<span class="sub">An emulation of the Launchpad Pro MK3 integration — plus assignable knobs, songs and graphics</span></h1>
+  <p class="standfirst">The Move's pads become the M8's Launchpad grid, and everything the M8 does with a
+  Launchpad works unchanged. Its nine encoders become named, CC-mapped knobs with filter and envelope
+  graphics, organised into songs you can switch with one button press.</p>
+
+  <div class="hero">
+    <figure>
+      <img class="shot" width="128" height="64"
+           src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAABACAAAAAD3vSCjAAACa0lEQVR42uVZC7LDIAjk/pfe15f4AQHFJMbO1EzaTk1kXQ0shAhEx6kaPo1eaB6AV4yfEz2MIX0Xwyg8/P8+yFjDCdJB5ZOE6Wwe/mLdXgLgmFyFwsEx06sYoGJ2AGAZA2UPcPtpumJv4LWd+WLDoNHmfuxn4Dfa9pluJ/t0ghshJCe8jQbU4ykQc6MALYYH2mX7kpHLxwwHWHXgmv2HGDhX88IKvM4CFjIQYgHrjy4IvIOgw9QXhcOsjE+NqKNl8i9ZPaosSmhn6CSrjq/vl6dyI2CYaqbQZlFCX8NX3oarlgCgEOoBaABg7n4JAO4AnFsYSygFvrkE/v24wwDp9AWdvsgeoMEemAUg7x8BUA5MPwWqH/xZUv1lCdnnL6jqub9HqnkQz+B5+ejVfePdRXM0tePtJxW4jCPdeA4vytkKPJgyjmMXHO0B+y51tZ82B9WNg8/BpUe7q68CCgA9ZUDTSiuq7mJs0LMKM7ru7OpVCEJPBK4o4FiWG/cJSxDAY8askt7Ut1FH/+XhT9SldTznotaM98RivTNbbcJUXO3pitqRLIVdkc51f/PdRGu4B4AuAuj0KgCwRW3h15DFTPfCrclHAcDRm85bHijnahUCewCaXlfUki2KIS8ETTFAglyoymUrao3KppTsmFyCX28TBb7gpXMVw7yodSfwX8QcXH2vdP5J5eEsLxfFZSzbrZuDp0/yAQEr1ebXhE2iimK7KnWwoFZz/zYJS4DlsCaAFmWaqR5ZBIUWACR9zAlCp5Yok6/OupnWNANgdPIoRBWHLg+JPcC8irEHeGARRlj5BQYAqmxJCnY+BX+lHON/sJMhYgAAAABJRU5ErkJggg=="
+           alt="The module's 128 by 64 display: the song name top left, a four-knob envelope drawn across the top row of cells, a filter and an LFO sharing the bottom row, and a bar along the foot reading JOG PAGE, CLK EDIT, SFT MORE.">
+      <figcaption>The knob page, captured from the device itself rather than drawn.</figcaption>
+    </figure>
+
+    <div class="callouts">
+      <div class="callout"><span class="pin">1</span><div><b>Song name, top left</b><span>Which song's knobs you are looking at. The ticks to its right are its pages.</span></div></div>
+      <div class="callout"><span class="pin">2</span><div><b>An envelope, as one picture</b><span>Four knobs sharing a shape rather than drawing four dials — attack, decay, sustain, release.</span></div></div>
+      <div class="callout"><span class="pin">3</span><div><b>A filter and an LFO below</b><span>Two more graphics, two knobs each. Names sit under the cells they belong to.</span></div></div>
+      <div class="callout"><span class="pin">4</span><div><b>The hint bar</b><span><code>JOG PAGE</code>, <code>CLK EDIT</code>, <code>SFT MORE</code> — and all three change while Shift is held.</span></div></div>
+      <div class="callout"><span class="pin">5</span><div><b>Touch a knob</b><span>Its name becomes its value, inverted, and the top right names what it is connected to.</span></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="cols">
+<nav class="rail" aria-label="Contents">
+  <p class="part">Part one · Launchpad</p>
+  <ul>
+    <li><a href="#start">Before you start</a></li>
+    <li><a href="#map">Button map</a></li>
+    <li><a href="#global">Global actions</a></li>
+    <li><a href="#browser">File browser</a></li>
+    <li><a href="#session">Session mode</a></li>
+    <li><a href="#beatrepeat">Beat repeat</a></li>
+    <li><a href="#note">Note mode</a></li>
+    <li><a href="#sequencer">Sequencer mode</a></li>
+    <li><a href="#pads">Pads &amp; views</a></li>
+  </ul>
+  <p class="part">Part two · The Move</p>
+  <p class="grp">Jog Click — one knob</p>
+  <ul>
+    <li><a href="#knobs">The knob page</a></li>
+    <li><a href="#cursor">The knob cursor</a></li>
+    <li><a href="#adding">Adding a knob</a></li>
+    <li><a href="#eq">The EQ</a></li>
+    <li><a href="#settings-knob">Knob settings</a></li>
+    <li><a href="#graphics">Knob graphics</a></li>
+  </ul>
+  <p class="grp">Shift+Jog Click — global</p>
+  <ul>
+    <li><a href="#settings">The Settings menu</a></li>
+    <li><a href="#songmgmt">Managing songs</a></li>
+    <li><a href="#presets">Song presets</a></li>
+  </ul>
+  <ul>
+    <li><a href="#trouble">Troubleshooting</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<div class="parthead">
+  <span class="k">Part one</span>
+  <h2>The Launchpad integration</h2>
+  <p>This half is the M8's own feature. The module emulates a Launchpad Pro MK3, so the M8 behaves exactly as
+  it would with one plugged in — these controls belong to the M8, not to the Move.</p>
+</div>
+
+<section id="start">
+  <h2>Before you start</h2>
+  <p class="lede">Three things have to line up: the M8 has to be told a Launchpad is attached, the module has
+  to be running, and — for the knobs — the control channels have to agree.</p>
+
+  <h3>On the M8</h3>
+  <p><span class="tag m8">M8</span> In <strong>MIDI Settings</strong>, set <strong>CTRL SURFACE</strong> to
+  <strong>“Launchpad Pro”</strong>. Without this the M8 ignores the grid entirely.</p>
+  <p>If you are going to use the Move's knobs, also set <strong>CONTROL MAP CHANNEL</strong> to match
+  <strong>Knob Chan</strong> in the module's Settings — <kbd>Shift</kbd>+<strong>step 2</strong> on the Move,
+  once the module is running. Both default to <span class="hx">4</span>.</p>
+
+  <h3>On the Move</h3>
+  <p>Plug a <strong>hardware M8</strong> into the Move's <strong>USB-A</strong> port. Hold <kbd>Shift</kbd> and
+  press <strong>step 13</strong> to open Schwung's Tools menu, then pick the M8 module from below the divider.</p>
+  <p>The <strong>M8 app for iOS and iPadOS</strong> drives this module too.
+  Connect the iPad to the Move's <strong>USB-C</strong> port rather than USB-A, and set
+  <strong>CTRL SURFACE</strong> in the app exactly as you would on the hardware. Everything in Part one behaves
+  the same way; the app is the M8 at the other end of the same Launchpad conversation.</p>
+  <div class="note">
+    <p class="h">Over USB-C, one of the Move's MIDI ports is the one that counts</p>
+    <p>The Move offers four MIDI ports over USB-C, and only <strong>“Ableton Move Standalone Port”</strong>
+    carries MIDI through to Schwung — the Live, User and External ports do not reach it at all. Anything
+    talking to this module has to be on the Standalone port. Software that lets you choose should be pointed
+    at it; software that chooses for you and picks another will look connected and do nothing, because
+    traffic on the other three never arrives.</p>
+  </div>
+  <p>To leave it again: hold <kbd>Shift</kbd> and touch the <strong>volume knob</strong> and the
+  <strong>jogwheel</strong>, or use <strong>Exit Module</strong> in the module's own Settings.</p>
+  <p>On a first start the module announces itself as a Launchpad as soon as it loads, and keeps retrying about
+  once a second until the M8 answers, so it does not matter which device was switched on first.</p>
+  <p>When it reopens with a <strong>remembered screen</strong> it stays quiet instead — see
+  <a href="#trouble">Troubleshooting</a>. Hearing the announcement, the M8 initialises its control surface from
+  scratch and lands on Session, which would drag it off whatever you were on. If the M8 really did restart while
+  the module was away it asks on its own, and that is still answered.</p>
+
+  <div class="note">
+    <p class="h">The knobs are mapped on the M8, not here</p>
+    <p>M8 uses a <strong>learn</strong> system, and nothing in this module addresses an M8 parameter by CC.
+    A knob's name, starting value and header line are labels — they describe what you <em>intend</em> the knob
+    to do. The connection itself is made on the M8:</p>
+    <p><span class="tag m8">M8</span> Put the cursor on the parameter, hold <kbd class="m8">OPTION</kbd>, and turn the
+    Move knob you want to drive it.</p>
+  </div>
+
+  <h3>The channels the integration itself uses</h3>
+  <p>Separately from your knobs, the Launchpad conversation runs on fixed channels that
+  <strong>cannot be changed</strong> at either end:</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Direction</th><th>Channel</th><th>Carries</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Module → M8</td><td class="num">1</td><td>Button and pad presses, as CC <span class="hx">1</span>–<span class="hx">98</span></td></tr>
+        <tr><td class="k">M8 → module</td><td class="num">1</td><td>A steady LED</td></tr>
+        <tr><td class="k">M8 → module</td><td class="num">2</td><td>A blinking LED</td></tr>
+        <tr><td class="k">M8 → module</td><td class="num">3</td><td>A pulsing LED</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>This is why the knob channel defaults to <span class="hx">4</span>: it has to stay out of the way. It is
+  also why blink and pulse are described throughout as things the <em>M8</em> decides — the module is only
+  told which of the three channels a colour arrived on, and reproduces it on the Move's own LEDs.</p>
+
+  <div class="note warn">
+    <p class="h">Keep channels 1–3 clear on the Move as well</p>
+    <p>Anything else on those three channels lands in the middle of the Launchpad conversation, and the
+    symptoms are confusing rather than obvious: pads that light at the wrong moment, a grid that stops
+    repainting, notes the M8 never asked for.</p>
+    <ul class="plain">
+      <li>Set <strong>Move's own tracks</strong> to channel <span class="hx">4</span> or higher.</li>
+      <li>Set <strong>Schwung's shadow-mode slots</strong> to channel <span class="hx">4</span> or higher —
+        both the receive and the forward channel of each slot.</li>
+      <li>Above all, do not have a Move track <em>listening</em> on 1–3 and <em>outputting</em> to 1–3. That
+        is a MIDI echo: whatever the M8 says comes straight back at it.</li>
+    </ul>
+    <p>The same goes for any synth or module you add later. Four to sixteen is yours; one to three belongs to
+    the Launchpad.</p>
+  </div>
+</section>
+
+<section id="map">
+  <h2>Button map</h2>
+  <p class="lede">Each Move button is forwarded to the Launchpad control named beside it. The CC and
+  Launchpad columns are what actually travels down the wire, useful when something is not behaving.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Move</th><th>Launchpad</th><th>Does on the M8</th><th>CC</th><th>LP note</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><kbd>Back</kbd> <span class="hx">&lt;</span></td><td>Session</td><td>Opens session mode (song view)</td><td class="num">51</td><td class="num">93</td></tr>
+        <tr><td class="k"><kbd>Menu</kbd> <span class="hx">☰</span></td><td>Note</td><td>Opens note mode</td><td class="num">50</td><td class="num">94</td></tr>
+        <tr><td class="k"><kbd>Capture</kbd></td><td>Sequencer</td><td>Opens sequencer mode</td><td class="num">52</td><td class="num">97</td></tr>
+        <tr><td class="k"><kbd>Sample</kbd></td><td>Projects</td><td>Load-project menu, and the instrument pool</td><td class="num">118</td><td class="num">98</td></tr>
+        <tr><td class="k"><kbd>Play</kbd></td><td>Play</td><td>Play / pause</td><td class="num">85</td><td class="num">20</td></tr>
+        <tr><td class="k"><kbd>Rec</kbd></td><td>Record</td><td>Recording; toggles session-edit mode</td><td class="num">86</td><td class="num">10</td></tr>
+        <tr><td class="k"><kbd>Undo</kbd></td><td>Record arm</td><td>Also recalls a stored snapshot</td><td class="num">56</td><td class="num">1</td></tr>
+        <tr><td class="k"><kbd>Mute</kbd></td><td>Mute</td><td>Switches muting between momentary and toggle — see below</td><td class="num">88</td><td class="num">2</td></tr>
+        <tr><td class="k"><kbd>Loop</kbd></td><td>Solo</td><td>Switches soloing between momentary and toggle — see below</td><td class="num">58</td><td class="num">3</td></tr>
+        <tr><td class="k"><kbd>Copy</kbd></td><td>Duplicate</td><td>Copy chains and song rows</td><td class="num">60</td><td class="num">50</td></tr>
+        <tr><td class="k"><kbd>Delete</kbd></td><td>Clear</td><td>Delete / cut a selection</td><td class="num">119</td><td class="num">60</td></tr>
+        <tr><td class="k"><kbd>Shift</kbd></td><td>Shift</td><td>Modifier — also the module's own</td><td class="num">49</td><td class="num">90</td></tr>
+        <tr><td class="k"><kbd>Left</kbd> <kbd>Right</kbd></td><td>Navigation <span class="hx">&lt;&gt;</span></td><td>Change track</td><td class="num">62 · 63</td><td class="num">91 · 92</td></tr>
+        <tr><td class="k"><kbd>Up</kbd> <kbd>Down</kbd></td><td>Octave <span class="hx">∧∨</span></td><td>Scroll rows, pitches, instruments</td><td class="num">55 · 54</td><td class="num">80 · 70</td></tr>
+        <tr><td class="k">Track <kbd>1</kbd>–<kbd>4</kbd></td><td>Row select <span class="hx">|</span></td><td>Select a song row</td><td class="num">43 42 41 40</td><td class="num">right column</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Pads are <strong>step inputs by column</strong>. The Up and Down buttons are the Launchpad's octave
+  buttons, which the M8's documentation also calls the <span class="hx">∧∨</span> arrows.</p>
+
+  <div class="note">
+    <p class="h">Where the Launchpad's two edges live</p>
+    <p>A Launchpad has eight <span class="hx">→</span> <strong>row buttons</strong> down its right-hand edge,
+    one per grid row, and eight <strong>T1–T8 track buttons</strong> along its bottom. The Move carries both.</p>
+    <p>The four <strong>track buttons</strong> are the row buttons <em>for the four rows on screen</em>, so
+    they follow the half switch: rows 1–4 on the top half, rows 5–8 on the bottom. Wherever a row button does
+    something — playing and cueing song rows, choosing a velocity while holding a note — the other four are
+    one half-switch away.</p>
+    <p>The eight <strong>odd-numbered step buttons</strong> — steps 1, 3, 5 … 15, the ones the M8 lights — are
+    <strong>T1–T8</strong>. That is how a track is muted or soloed, and how the current track shows itself.
+    The even steps between them are this module's own song presets and never reach the M8.</p>
+    <p><strong>Holding <kbd>Shift</kbd> claims the first two steps</strong> for this module: step 1 opens Songs
+    and step 2 opens Settings. A shifted step 1 is not passed on as T1, so the M8 never sees half a press; every
+    other step, and all eight unshifted, behave exactly as above.</p>
+  </div>
+
+  <p>The Launchpad's <strong>Novation logo</strong>, which the M8 lights to show live mode, is the small LED
+  <strong>below step 16</strong> on the Move.</p>
+</section>
+
+<section id="global">
+  <h2>Global actions</h2>
+  <p class="lede">Available in every mode.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Gesture</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><kbd>Play</kbd></td><td>Play / pause</td></tr>
+        <tr><td class="k"><kbd>Mute</kbd></td><td>Switches muting between momentary and toggle. No Shift, and nothing to hold</td></tr>
+        <tr><td class="k"><kbd>Loop</kbd></td><td>Switches soloing between momentary and toggle, the same way</td></tr>
+        <tr><td class="k"><kbd>Shift</kbd>+<kbd>Undo</kbd></td><td>Store a snapshot</td></tr>
+        <tr><td class="k"><kbd>Undo</kbd></td><td>Recall the stored snapshot</td></tr>
+        <tr><td class="k"><kbd>Left</kbd> <kbd>Right</kbd></td><td>Outside session mode, choose the track the pads play. The step buttons light briefly to show which one</td></tr>
+        <tr><td class="k"><kbd>Rec</kbd></td><td>Outside note mode, toggles <strong>edit mode</strong> for the mode you are in</td></tr>
+        <tr><td class="k"><kbd>Rec</kbd>+<kbd>Play</kbd></td><td>Outside session mode, records what you play into the current track with the current instrument</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Mute and solo: the button picks the mode, a step button picks the track</h3>
+  <p><kbd>Mute</kbd> and <kbd>Loop</kbd> are the Launchpad's Mute and Solo. A plain press — no Shift, nothing
+  held — switches that function between <strong>momentary</strong>, where the button blinks and the mute lasts
+  only while you hold the track, and <strong>toggle</strong>, where it latches.</p>
+  <p>The muting itself is done with the <strong>odd-numbered step buttons</strong>, which are the Launchpad's
+  T1–T8: in mute toggle mode, pressing step 1 mutes track 1. The sense can be inverted — mute a track
+  statically first, then switch to momentary, and holding it <em>un</em>mutes.</p>
+
+  <p>Which tracks the pads can reach depends on the mode — <strong>note mode reaches any track</strong>,
+  <strong>sequencer mode only tracks that are not empty</strong>.</p>
+</section>
+
+<section id="browser">
+  <h2>File browser</h2>
+  <p class="lede">Loading a project or an instrument puts the M8's file browser on screen, and the same few
+  buttons drive it wherever it was opened from. <kbd>Sample</kbd> is both the way in and the way out.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Button</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><kbd>Up</kbd> <kbd>Down</kbd></td><td>Move through the directory</td></tr>
+        <tr><td class="k"><kbd>Left</kbd> <kbd>Right</kbd></td><td>Jump to the first or last entry</td></tr>
+        <tr><td class="k"><kbd>Play</kbd></td><td>Preview the song or instrument under the cursor</td></tr>
+        <tr><td class="k"><kbd>Shift</kbd></td><td>Yes — load it</td></tr>
+        <tr><td class="k"><kbd>Sample</kbd></td><td>Cancel</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <p class="h">Loading a song asks nothing, and queues it</p>
+    <p><kbd>Shift</kbd> is the yes: there is no confirmation step. The song is <strong>queued</strong> rather
+    than swapped in on the spot, so what is playing carries on until it comes round.</p>
+  </div>
+</section>
+
+<section id="session">
+  <h2>Session mode</h2>
+  <p class="lede"><kbd>Back</kbd>. The song view, and where the M8 starts. Each pad is a <strong>chain</strong>:
+  eight tracks across, and song rows down — the topmost row of the grid is the lowest-numbered song row, as on
+  the M8's own screen, which marks the span the grid is looking at with <strong>square brackets</strong>.</p>
+  <ul class="plain">
+    <li><kbd>Up</kbd> <kbd>Down</kbd> scroll the span one row at a time; <kbd>Shift</kbd> + either scrolls a
+      whole page of eight.</li>
+    <li>Track buttons are the row buttons: they <strong>play or cue</strong> a song row.</li>
+    <li><kbd>Play</kbd> plays the current row.</li>
+    <li><kbd>Shift</kbd>+<kbd>Left</kbd> toggles between <strong>live mode</strong> and <strong>song mode</strong>.
+      Live mode lets you queue or play individual chains, and lights the logo LED below step 16.</li>
+    <li><kbd>Sample</kbd> opens and closes the <strong>load project</strong> browser for an
+      <code>.m8s</code> song — see File browser above.</li>
+    <li><kbd>Shift</kbd> + a pad <strong>stops</strong> that chain.</li>
+  </ul>
+
+  <h3>What the colours mean</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Pad</th><th>Is</th></tr></thead>
+      <tbody>
+        <tr><td class="k">White</td><td>A chain</td></tr>
+        <tr><td class="k">Dark pink</td><td>An empty slot</td></tr>
+        <tr><td class="k">Bright pink</td><td>A bookmarked chain</td></tr>
+        <tr><td class="k">Green</td><td>Playing — dimmer green if the chain is empty</td></tr>
+        <tr><td class="k">Blinking green</td><td>Cued, waiting to come in</td></tr>
+        <tr><td class="k">Pulsing blue</td><td>The cursor, in edit mode only</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The Move reproduces blink and pulse in software, because its own LEDs animate differently from a
+  Launchpad's. A pad that pulses is pulsing between its colour and a dimmer neighbour of the same colour, so
+  a pulsing blue cursor still reads as blue.</p>
+  <p>The flash is timed in <strong>milliseconds</strong> — 450ms a side, so a full cycle is a little under a
+  second — and therefore runs at the same speed on every screen. Counting frames instead would not: the knob page
+  is a far heavier draw than a menu list and drops frames, which would make the same flash visibly faster the
+  moment a menu opened.</p>
+
+  <h3>Session-edit mode</h3>
+  <p>Press <kbd>Rec</kbd> to toggle it. The pulsing blue pad is the cursor, and <strong>every other copy of
+  the chain it is on pulses too</strong> — the quickest way to see where else in the song a chain is used.</p>
+  <ul class="plain">
+    <li>Hold <kbd>Copy</kbd> and a pad, then tap an <strong>empty</strong> pad to paste the chain there.</li>
+    <li>Hold <kbd>Copy</kbd> and a pad, then <strong>double</strong>-tap a pad — empty or not — for a
+      <strong>deep clone</strong>: a new chain with new phrases, rather than another reference to the same one.</li>
+    <li>Hold <kbd>Copy</kbd> and a row button, then tap another row, to copy the row and insert it.</li>
+    <li>Hold <kbd>Delete</kbd> and press a pad or a row button to clear it.</li>
+    <li><strong>Double-tap a chain</strong> to edit it in sequencer mode — the M8's screen follows to that
+      phrase. This is an edit-mode gesture only; in play mode a double tap does nothing of the sort.</li>
+  </ul>
+</section>
+
+<section id="beatrepeat">
+  <h2>Beat repeat</h2>
+  <p class="lede"><kbd>Shift</kbd>+<kbd>Back</kbd>. A second session screen, and one of the things a
+  Launchpad adds that the M8 has no other way to do. <strong>The M8 has to be playing</strong> for it to do
+  anything.</p>
+  <ul class="plain">
+    <li><strong>Rows 6 and 7</strong> set the range to repeat: press two pads for a span, or one pad on its own.</li>
+    <li><strong>Row 8</strong> chooses which tracks the repeat applies to. The rest carry on normally.</li>
+  </ul>
+  <p>Counting from the top as everywhere else, those three are the last rows of the eight — the
+  <strong>bottom half</strong> on the Move. Press <kbd>Shift</kbd>+<kbd>Back</kbd> again to switch halves
+  while you are here; plain <kbd>Back</kbd> returns to the main session screen.</p>
+</section>
+
+<section id="note">
+  <h2>Note mode</h2>
+  <p class="lede"><kbd>Menu</kbd>. A grid pad controller for the currently selected instrument — also how you
+  enter notes while a recording method is active.</p>
+  <ul class="plain">
+    <li><kbd>Left</kbd> <kbd>Right</kbd> change track, or switch directly with a column selection. Note mode
+      can reach <strong>any</strong> track, empty or not.</li>
+    <li><kbd>Up</kbd> <kbd>Down</kbd> scroll to higher and lower note pitches.</li>
+    <li><kbd>Shift</kbd> + <kbd>Up</kbd> <kbd>Down</kbd> load an instrument from the pool.</li>
+    <li><kbd>Sample</kbd> opens and closes the browser for an <code>.m8i</code> instrument file, which then
+      plays on the current track.</li>
+    <li>Hold <kbd>Rec</kbd> and press <kbd>Play</kbd> to start live recording into the active phrase.</li>
+    <li>For manual note entry, hold <kbd>Rec</kbd> and press a note's pad while the M8's cursor sits in the
+      <strong>N column</strong> of a phrase view.</li>
+  </ul>
+  <p>The M8's own screen does not change for this mode — if you came from session mode, the square brackets
+  simply stop being drawn.</p>
+
+  <h3>Reading the keyboard</h3>
+  <ul class="plain">
+    <li><strong>White pads</strong> are the octaves of the first non-empty note of the current scale.</li>
+    <li><strong>Green pads</strong> are notes sounding right now — several at once if the instrument is a
+      HyperSynth, which lights every pad it is using.</li>
+    <li>The pad you hit lights, and so does the track button it belongs to.</li>
+    <li>On a 12-note scale, including the ordinary chromatic one, <strong>the pad above any pad is a perfect
+      fourth up</strong>. The layout is the same one the sequencer's bottom half uses.</li>
+  </ul>
+</section>
+
+<section id="sequencer">
+  <h2>Sequencer mode</h2>
+  <p class="lede"><kbd>Capture</kbd>, or a double tap on a chain while session-<em>edit</em> mode is on. The
+  M8's screen shows the phrase view. On a Launchpad the grid holds three zones at once; on the Move they fall either side of the
+  half switch, which turns out to be the natural split.</p>
+
+  <div class="screenrow two">
+    <div>
+      <div class="pads" aria-label="Top half: notes on the left four columns, phrases on the right four">
+        <div class="on">N</div><div class="on">N</div><div class="on">N</div><div class="on">N</div><div>P</div><div>P</div><div>P</div><div>P</div>
+        <div class="on">N</div><div class="on">N</div><div class="on">N</div><div class="on">N</div><div>P</div><div>P</div><div>P</div><div>P</div>
+        <div class="on">N</div><div class="on">N</div><div class="on">N</div><div class="on">N</div><div>P</div><div>P</div><div>P</div><div>P</div>
+        <div class="on">N</div><div class="on">N</div><div class="on">N</div><div class="on">N</div><div>P</div><div>P</div><div>P</div><div>P</div>
+      </div>
+      <p class="viewkey"><strong>Top half</strong> — the 16 <strong>notes</strong> of the current phrase on
+      the left, the 16 <strong>phrases</strong> of the current chain on the right.</p>
+    </div>
+    <div>
+      <div class="pads" aria-label="Bottom half: the keyboard">
+        <div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div>
+        <div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div>
+        <div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div>
+        <div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div><div>K</div>
+      </div>
+      <p class="viewkey"><strong>Bottom half</strong> — the same keyboard as note mode, for auditioning and
+      for setting the note under the cursor.</p>
+    </div>
+  </div>
+
+  <ul class="plain">
+    <li><kbd>Left</kbd> <kbd>Right</kbd> change track — here, only tracks that are <strong>not empty</strong>.</li>
+    <li><kbd>Up</kbd> <kbd>Down</kbd> scroll the keyboard.</li>
+    <li><kbd>Sample</kbd> opens the browser for an <code>.m8i</code> instrument file for the keyboard.</li>
+    <li>Play a phrase by holding its <strong>phrase pad</strong> and pressing <kbd>Play</kbd>.</li>
+  </ul>
+
+  <h3>Sequencer-edit mode</h3>
+  <p><kbd>Rec</kbd> toggles it, and it is where a phrase can be <em>edited</em> — the notes are still played
+  and recorded the usual ways. All the <kbd>Copy</kbd> and <kbd>Delete</kbd> gestures from session-edit mode
+  work here too.</p>
+  <ul class="plain">
+    <li>Tap an <strong>empty</strong> pad in the note block to create a note; tap one in the phrase block to
+      create a phrase — the same thing as <kbd class="m8">EDIT</kbd>+<kbd class="m8">EDIT</kbd> on the M8.</li>
+    <li><kbd>Shift</kbd> + <kbd>Left</kbd> <kbd>Right</kbd> rotate the notes within the phrase.</li>
+  </ul>
+  <p><strong>Hold an existing note</strong> in the phrase and the rest of the surface describes it:</p>
+  <ul class="plain">
+    <li>The four track buttons become its <strong>velocity</strong> — they are the row buttons, so they cover
+      four of the eight levels at a time and a half-switch reaches the others.</li>
+    <li><kbd>Up</kbd> <kbd>Down</kbd> shift it by an octave.</li>
+    <li>Hold <kbd>Shift</kbd> to browse the instrument pool, and release it to choose.</li>
+  </ul>
+  <p><strong>A keyboard pad plays its note</strong>, and that note becomes the one written when you next press
+  an <strong>empty</strong> pad in the note block. So the keyboard both auditions the pitch and arms it.</p>
+  <p><strong>Hold a phrase</strong> and <kbd>Up</kbd> <kbd>Down</kbd> <strong>transpose</strong> it — nothing
+  else need be held. <kbd>Play</kbd> while holding one loops that phrase instead.</p>
+</section>
+
+<section id="pads">
+  <h2>Pads &amp; views</h2>
+  <p class="lede">The Launchpad grid is 8 × 8 and the Move has 8 × 4, so the pads show half the grid at a time.
+  This is the one place the Move's surface genuinely differs.</p>
+
+  <p>Rows are counted <strong>from the top down</strong> here, the way the M8 lists them: row 1 is the top
+  row of the Launchpad grid and row 8 the bottom, and on the M8's own screen row 1 is song row
+  <span class="hx">00</span>.</p>
+
+  <div class="screenrow two">
+    <div>
+      <div class="pads" aria-label="Top view: rows 1 to 4">
+        <div class="on">1</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div>
+        <div class="on">2</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div>
+        <div class="on">3</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div>
+        <div class="on">4</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div>
+      </div>
+      <p class="viewkey"><strong>Top</strong> — rows 1–4, the first four of the eight. Steady light on the
+      mode button.</p>
+    </div>
+    <div>
+      <div class="pads" aria-label="Odd-rows view: rows 1, 3, 5 and 7">
+        <div class="on">1</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div>
+        <div class="on">3</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div>
+        <div class="on">5</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div>
+        <div class="on">7</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div><div class="on">·</div>
+      </div>
+      <p class="viewkey"><strong>Odd rows</strong> — rows 1, 3, 5, 7, which on the M8 are song rows
+      <span class="hx">00</span>, <span class="hx">02</span>, <span class="hx">04</span>,
+      <span class="hx">06</span>: a whole phrase at half resolution.</p>
+    </div>
+  </div>
+
+  <p>Three stops in the cycle: <strong>Top</strong> (rows 1–4, steady light), <strong>Bottom</strong> (rows 5–8,
+  pulsing), and — only if <strong>Odd Rows</strong> is switched on in Settings (<kbd>Shift</kbd>+<strong>step 2</strong>) —
+  <strong>Odd rows</strong> (fast blink). The animation on the current mode button tells you which one you are on.</p>
+
+  <h3>The mode button you are already on switches halves</h3>
+  <p><span class="tag move">Move only</span> Each screen has one button that reaches it, and pressing that
+  button when you are <em>already there</em> switches which half you see instead:</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>On this screen</th><th>This button switches halves</th><th>Stops</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Session</td><td class="k"><kbd>Back</kbd></td><td>Top · Bottom · Odd rows</td></tr>
+        <tr><td class="k">Beat repeat</td><td class="k"><kbd>Shift</kbd>+<kbd>Back</kbd></td><td>Top · Bottom</td></tr>
+        <tr><td class="k">Note</td><td class="k"><kbd>Menu</kbd></td><td>Top · Bottom</td></tr>
+        <tr><td class="k">Sequencer</td><td class="k"><kbd>Capture</kbd></td><td>Top · Bottom</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Pressing a <em>different</em> mode button changes screen, and <strong>each screen keeps its own
+  half</strong> — the sequencer can sit on its keyboard while session mode stays on the rows you are
+  arranging, and coming back to a screen puts you where you left it rather than on the top. A screen you have
+  not visited yet opens on the top half. The press is still forwarded to the M8 either way; pressing Session
+  while on session mode means nothing over there, which is what makes the button free to do this.</p>
+
+  <div class="note">
+    <p class="h">Odd rows is a session-mode feature</p>
+    <p>On this view the <kbd>Up</kbd> <kbd>Down</kbd> arrows move <strong>two M8 rows per press</strong>, so
+    the next four odd rows come up rather than the whole grid shifting by one under your hand.
+    <kbd>Shift</kbd> + either is <em>not</em> doubled: a page is eight rows already, which is exactly what
+    this view spans, so it lands on the next screenful on its own.</p>
+    <p>Showing every other row means something on a grid of song rows and nothing on a keyboard or a step
+    editor, so the third view is offered only on the <strong>main session screen</strong>. Switch to note,
+    sequencer or beat repeat and the cycle quietly drops back to two stops; press <kbd>Back</kbd> and the
+    third returns. Leaving session mode while the odd view is showing puts the pads back on the top half
+    rather than stranding them.</p>
+  </div>
+</section>
+
+<div class="parthead">
+  <span class="k">Part two</span>
+  <h2>What the Move adds</h2>
+  <p>None of this exists on a real Launchpad. The Move has nine encoders and a screen, so the module uses
+  them for a second job: a bank of named, CC-mapped knobs with live graphics, saved into songs. It has two
+  doors, and which one you want depends on what you are changing: <strong><kbd>Jog Click</kbd></strong>
+  raises a cursor for whichever knob you land on, and the <strong>step row behind <kbd>Shift</kbd></strong>
+  opens the two global screens — <strong>step 1</strong> for Songs, <strong>step 2</strong> for Settings —
+  neither of which holds anything knob-specific at all.</p>
+</div>
+
+<section id="knobs">
+  <h2>The knob page</h2>
+  <p class="lede">Knobs 1–8 are yours to assign. They live in <strong>pages</strong> of eight, and pages belong
+  to a <strong>song</strong>. Knob 9 (Main) stands outside all of it as a plain pass-through, with its own CC
+  and channel in the Settings menu (<kbd>Shift</kbd>+<strong>step 2</strong>).</p>
+
+  <p>The display always shows the active song's current page. Turn the <kbd>Jog</kbd> wheel to move between
+  pages — or to walk the knob cursor, once a click has raised it. Pages are created and pruned automatically
+  as knobs need them.</p>
+
+  <p><strong>Touch or turn a knob</strong> and two things happen: its name is replaced by its live value,
+  inverted, and the top right of the display names what it is connected to — <code>Ins0A Cut</code>,
+  <code>Ins0A M2 Amt</code>, <code>REV Room Size</code>. Let go and both clear. A three-letter name on a
+  32-pixel cell cannot say which instrument it belongs to; this is where that lives.</p>
+
+  <h3>The bar along the bottom</h3>
+  <p>The grid gives up its last nine rows to a <strong>hint bar</strong> — the
+  same one every other Schwung screen carries, each pair a key in an inverted pill and what it does beside it.
+  Three fit across the panel.</p>
+  <p><strong>Holding <kbd>Shift</kbd> swaps all three.</strong> The page has two sets of gestures and room for
+  one, and the Shift set is the half nobody can guess: that the step buttons reach the two menus, and that Shift
+  while turning a knob auditions the change and puts it back. Shift is where you would go to ask what else is
+  there, so asking it answers itself.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Where</th><th>Plain</th><th>With <kbd>Shift</kbd></th></tr></thead>
+      <tbody>
+        <tr><td class="k">The knob page</td><td><code>JOG PAGE</code> · <code>CLK EDIT</code> · <code>SFT MORE</code></td><td><code>ST1 SONG</code> · <code>ST2 SETUP</code> · <code>KNB TRY</code></td></tr>
+        <tr><td class="k">The knob cursor</td><td><code>JOG KNOB</code> · <code>CLK EDIT</code> · <code>BCK EXIT</code></td><td><code>JOG MOVE</code> · <code>CPY COPY</code> · <code>DEL DEL</code></td></tr>
+        <tr><td class="k">The song list</td><td><code>JOG MOVE</code> · <code>CLK SEL</code> · <code>BCK EXIT</code></td><td><code>JOG ORDER</code> · <code>CPY DUP</code> · <code>DEL DEL</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The wheel's hint follows what the wheel actually does: it pages on the knob page, walks knobs under the
+  cursor, and <strong>is dropped entirely until the song has more than one page of knobs</strong>. Pages that
+  hold something are what count — filling a page adds an empty one behind it so there is always somewhere to put
+  the next knob, and a blank is a place the wheel can go rather than a place worth pointing at.</p>
+
+  <h3>Value displays</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Display</th><th>Shows</th><th>Use for</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>Hex</strong></td><td class="num">00 – FF</td><td>The default. Matches the M8.</td></tr>
+        <tr><td class="k"><strong>0-127</strong></td><td class="num">0 – 127</td><td>Thinking in raw MIDI.</td></tr>
+        <tr><td class="k"><strong>0-1</strong></td><td class="num">0.00 – 1.00</td><td>Amounts and depths.</td></tr>
+        <tr><td class="k"><strong>-1..1</strong></td><td class="num">−1.00 – 1.00</td><td>Anything centred, like pan.</td></tr>
+        <tr><td class="k"><strong>dB</strong></td><td class="num">−40.00 – 39.38</td><td>An EQ band's gain, as the M8 prints it.</td></tr>
+        <tr><td class="k"><strong>Q</strong></td><td class="num">01 – 99</td><td>An EQ band's Q.</td></tr>
+        <tr><td class="k"><strong>Hz</strong></td><td class="num">37 – 15000</td><td>An EQ band's frequency, looked up rather than calculated.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>An M8 parameter is a byte (<span class="hx">00</span>–<span class="hx">FF</span>) and a MIDI CC is seven
+  bits. A knob set to <strong>Hex</strong> holds the <em>byte</em> and sends half of it, so the number under
+  your hand is the one on the M8's own screen; the M8 hears one CC per two bytes, which is all seven bits can
+  carry. Every byte is still reachable — see Speed below. Note-valued rows, Tracking's low and high value,
+  are <span class="hx">00</span>–<span class="hx">7F</span> on the M8 too and count in ones.</p>
+
+  <h3>Speed</h3>
+  <p>How far one detent moves a knob, counted in CC steps so <strong>1x</strong> is what the knobs have
+  always done whatever they read in.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Speed</th><th>One detent moves</th><th>For</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>1x</strong></td><td>One CC — two bytes on a hex knob</td><td>The default</td></tr>
+        <tr><td class="k"><strong>1/2x</strong></td><td>One byte</td><td>Walking a hex knob through every value</td></tr>
+        <tr><td class="k"><strong>1/3x</strong> · <strong>1/4x</strong></td><td>Less than a byte — several detents per step</td><td>A parameter where a whole CC is too coarse to hear</td></tr>
+        <tr><td class="k"><strong>2x</strong></td><td>Two CCs</td><td>Crossing the whole range quickly</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Fractions accumulate, so a 1/4x knob moves on every fourth detent rather than rounding each one away.</p>
+
+  <h3>Min and Max</h3>
+  <p>Ends of a knob's travel, in whatever it reads in — a hex knob clamps at <span class="hx">30</span> to
+  <span class="hx">4F</span>, not 48 to 79. Tightening one pulls the value in with it, and the knob simply
+  stops there rather than sending past it. On the device a shifted turn moves them by eight, since 256 bytes
+  is a long walk a detent at a time.</p>
+
+  <h3>The knob lights</h3>
+  <p>Each of the eight knobs has a <strong>light beneath it</strong> that shows where it stands, as a colour
+  walked along a <strong>sweep</strong>: the bottom of the travel is the sweep's first colour, the top its
+  last. The light slides between colours rather than snapping. (A Launchpad and some controllers ring the
+  knob with a collar of LEDs; the Move lights one lamp under each knob, so it shows the value as a colour
+  rather than as an arc.)</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Sweep</th><th>Runs</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>Neutral</strong> <span class="hx">Grey</span></td><td>Black → four greys → white, the brightness ramp Schwung maintains for knob lights. The default</td></tr>
+        <tr><td class="k"><strong>Synthwave</strong> <span class="hx">Syn</span></td><td>Deep blue → violet → magenta → pink</td></tr>
+        <tr><td class="k"><strong>Rose</strong></td><td>Near-black → mauve → pink</td></tr>
+        <tr><td class="k"><strong>Rainbow</strong> <span class="hx">Rain</span></td><td>Blue → cyan → green → yellow → orange → red</td></tr>
+        <tr><td class="k"><strong>Off</strong></td><td>Dark, whatever the value</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>Knob LED</strong> in Settings picks the sweep for every knob that has not named one of its own;
+  the <strong>LED</strong> row in Knob Settings is where a knob names one, and reads <em>Song</em> until it
+  does. An empty slot's light is dark.</p>
+  <p>The colour is read against the knob's <em>whole scale</em>, not its Min/Max — a knob leashed to the
+  middle of its travel lights the middle of the sweep, because the light says where the value is rather than
+  how far along its own leash it has got.</p>
+
+  <h3>Knob 9, Main</h3>
+  <p>It is a pass-through with no song behind it, so it has no cell of its own. Touch it or turn it and its
+  value appears in a <strong>panel over the middle of the page</strong> instead; let go and the page comes
+  back. It reads in hex by default, and its CC, channel, send mode and that choice of display all live on
+  one screen: <strong>Settings → Main Knob</strong>.</p>
+  <p><strong>Where you left it is remembered</strong> across a reload — it is kept with the settings, since it
+  belongs to no song. It is restored but not sent: pushing a value at the M8 on load would move a parameter
+  nobody touched, so the two agree again on your first turn.</p>
+
+  <h3>Auditioning a change</h3>
+  <p>Hold <kbd>Shift</kbd> and turn a knob: the M8 hears the move as you make it, and when you let
+  <kbd>Shift</kbd> go the value returns to where it was. Useful for hearing what a parameter does without
+  losing your setting. <strong>Main auditions the same way</strong>, and the two are independent — audition
+  a song knob and Main together and both go back.</p>
+
+</section>
+
+<section id="cursor">
+  <h2>The knob cursor</h2>
+  <p class="lede">Everything that belongs to <em>one knob</em> — its name, what it is connected to, its CC,
+  how it sends, how it reads, where it sits, and adding or removing it — is reached this way. None of it is
+  in the Settings menu, which holds only the handful of global rows further down.</p>
+  <p><strong>Click the jogwheel</strong> and a cursor appears over the eight slots, on the first one that
+  holds a knob. Turn the wheel to walk it, and click again to open what it lands on:</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Landing on</th><th>A second click opens</th></tr></thead>
+      <tbody>
+        <tr><td class="k">A knob</td><td>Knob settings for it</td></tr>
+        <tr><td class="k">An empty slot</td><td>The Add Knob wizard, on that slot</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Walking <strong>past either end runs onto the neighbouring page</strong>, arriving at its far end, so
+  every knob in the song is reachable without putting the cursor away. The first slot of the first page is a
+  wall, and so is the last of the last.</p>
+  <p>It <strong>reopens where you left it</strong>, and remembers that <em>per page</em> — editing one knob is
+  rarely one visit, and starting at the first knob each time meant walking the row again on every return.
+  Wandering to another page and back costs neither its place; a page you have not opened the cursor on yet
+  starts at its own first knob.</p>
+  <p><strong>Hold <kbd>Shift</kbd> and turn</strong> and the knob travels with
+  the cursor instead of the cursor moving over it — the same gesture the song list uses to reorder songs. A knob
+  that belongs to a <strong>graphic takes the whole picture with it</strong>, and the step is "next valid
+  position" rather than one slot, which is what lets a four-knob envelope move between rows at all: it cannot
+  slide within one. Whatever is in the way comes back the other way, so nothing is pushed off the page.</p>
+  <p>It stays on the page you are looking at. A slot <em>is</em> a physical encoder, so a knob moved to another
+  page would sit under no encoder at all.</p>
+  <p><strong><kbd>Shift</kbd>+<kbd>Copy</kbd></strong> duplicates what the cursor
+  is on into the next free slots, and <strong><kbd>Shift</kbd>+<kbd>Delete</kbd></strong> removes it. A graphic
+  copies whole, for the same reason it moves whole — its knobs have to sit together on one row or the picture is
+  not drawn. The copy gets <strong>fresh CCs</strong> and a picture of its own: two knobs learned to the same CC
+  would move together on the M8, which is the opposite of what a copy is for. Delete takes the one slot and
+  leaves its neighbours where they are, the same as Remove Knob in Knob Settings.</p>
+  <p>Both need <kbd>Shift</kbd>. Each is one keystroke from losing work, and unshifted those two buttons still
+  belong to the M8.</p>
+  <p><strong>The two buttons light while <kbd>Shift</kbd> is held</strong>, so the offer shows itself rather than
+  having to be remembered — and only while it really stands: the cursor up, <kbd>Shift</kbd> down, and a knob
+  under the cursor. On an empty slot they stay dark, because neither would do anything there and a lit button
+  that does nothing is worse than an unlit one. Their colour is borrowed from the M8 — Copy is the Launchpad's
+  Duplicate and Delete its Clear — and handed straight back on release.</p>
+  <p><kbd>Back</kbd> puts the cursor away. It is only an overlay on the knob page, not a screen of its own —
+  the pads, the mode buttons and the knobs all keep working underneath it, so raising it never interrupts
+  what the M8 is doing.</p>
+</section>
+
+<section id="adding">
+  <h2>Adding a knob</h2>
+  <p class="lede">Raise the knob cursor with <kbd>Jog Click</kbd>, walk it onto an <strong>empty</strong> slot
+  and click again. A page with no empty slot has no door — turn the wheel to the song's <strong>spare
+  page</strong>, which is always there for exactly this. In the wizard, <kbd>Jog</kbd> moves,
+  <kbd>Jog Click</kbd> picks, <kbd>Back</kbd> goes up a level.</p>
+
+  <div class="scroll">
+    <table class="wizard">
+      <thead><tr><th>Branch</th><th>Then</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k" rowspan="5"><strong>Generic</strong><br><span class="sub2">one level, no M8 parameter yet</span></td>
+          <td class="k">Knob</td><td>A single dial. You type the name.</td>
+        </tr>
+        <tr><td class="k">Envelope (3)</td><td>Attack, hold, decay — the shape AHD, Drum and Trig all draw</td></tr>
+        <tr><td class="k">Envelope (4)</td><td>ADSR</td></tr>
+        <tr><td class="k">Filter …</td><td>One row per filter type</td></tr>
+        <tr><td class="k">LFO …</td><td>One row per wave</td></tr>
+
+        <tr>
+          <td class="k" rowspan="3"><strong>Instrument</strong><br><span class="sub2">asks for the number first, a hex digit at a time</span></td>
+          <td class="k">Base</td><td>Amp, pan, dry, sends, filter — every instrument has these</td>
+        </tr>
+        <tr><td class="k">Mods</td><td>Slot 1–4, then AHD / ADSR / Drum / LFO / Trig / Tracking</td></tr>
+        <tr><td class="k">Instrument Type</td><td>Only the rows that type adds</td></tr>
+
+        <tr><td class="k"><strong>Mixer</strong></td><td class="k">—</td><td>Track and bus volumes, DJ filter, inputs</td></tr>
+        <tr><td class="k"><strong>Sends</strong></td><td class="k">—</td><td>ModFX, Delay, Reverb</td></tr>
+        <tr>
+          <td class="k" rowspan="2"><strong>EQ</strong><br><span class="sub2">asks which EQ, then lists all three bands</span></td>
+          <td class="k">Slot</td><td>One of the 128 numbered EQ slots, <span class="hx">00</span>–<span class="hx">7F</span>, entered a hex digit at a time</td>
+        </tr>
+        <tr><td class="k">Main Mix · ModFX · Delay · Reverb</td><td>The four EQs that are not slots</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>New knobs take the next free CC, start at the M8's own default for that parameter, and are
+  <strong>Hex</strong> + <strong>Absolute</strong>.</p>
+
+  <div class="note">
+    <p class="h">Generic is the shortcut</p>
+    <p>Everything under Generic is chosen by its <em>picture</em> and arrives with no M8 parameter behind it —
+    one click and the knobs are there. The three 3-knob envelopes are one row, because they draw the same shape
+    and differ only in what the M8 calls their knobs. Fill that in later with <strong>Connect</strong>.</p>
+    <p>Only the Instrument path records <em>which instrument</em>, which is why a mod knob added through Generic
+    says <code>M1 Atk</code> and one added through Instrument says <code>Ins00 M1 Atk</code>.</p>
+  </div>
+</section>
+
+<section id="eq">
+  <h2>The EQ</h2>
+  <p class="lede">M8 carries a <strong>three-band parametric EQ</strong> in more places than one, and the whole
+  of it is reachable from <strong>Add Knob → EQ</strong>.</p>
+  <p>There are <strong>128 numbered slots</strong>, <span class="hx">00</span>–<span class="hx">7F</span>, which
+  instruments are pointed at rather than owning — several instruments can name the same slot and share its
+  settings. Alongside those sit four more, one each for the <strong>main mix</strong> and the three send
+  effects. The wizard asks which one first; only the slot path asks for a number, and that number goes into the
+  knob's name, so <code>LGN0A</code> and <code>LGN2B</code> stay apart on the same page.</p>
+  <p>Each EQ has three bands — <strong>Low</strong>, <strong>Mid</strong> and <strong>High</strong> — and those
+  names describe their <em>defaults</em> rather than fixed roles: every band is functionally identical and can
+  be set up however you like. All three offer the same five rows:</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Row</th><th>Is</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>Gain</strong></td><td>Boost or cut for the band, in dB</td></tr>
+        <tr><td class="k"><strong>Freq</strong></td><td>The centre, or corner, frequency it works around</td></tr>
+        <tr><td class="k"><strong>Q</strong></td><td>Bandwidth — higher is tighter, lower is wider</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Nine rows, in one list — <code>Low Gain</code>, <code>Low Freq</code>, <code>Low Q</code>, <code>Mid Gain</code>
+  and so on — rather than a band step and then a parameter step.</p>
+
+  <div class="note">
+    <p class="h">Type and Mode are not here</p>
+    <p>Each band also has a <strong>TYPE</strong> — LowCut, LowShelf, Bell, Bandpass, Hi.Shelf, Hi.Cut or
+    AllPass — and a <strong>MODE</strong>: Stereo, Mid, Side, Left or Right. Neither is assignable over MIDI.
+    They are selectors you move on the device, so a knob pointed at one would be a knob that does nothing, and
+    the wizard does not offer them.</p>
+  </div>
+
+  <h3>They read in the M8's own units</h3>
+  <p>An EQ knob does not count in hex or in sevenths of a bit — it shows what the M8's EQ editor shows.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Row</th><th>Reads</th><th>Default</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>Gain</strong></td><td class="num">−40.00 – 39.38 dB</td><td class="num">0.00</td></tr>
+        <tr><td class="k"><strong>Q</strong></td><td class="num">01 – 99</td><td class="num">50</td></tr>
+        <tr><td class="k"><strong>Freq</strong></td><td class="num">37 – 15000 Hz</td><td class="num">Low 100 · Mid 982 · High 5089</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>Frequency is a lookup, not a curve.</strong> The 128 steps are spaced unevenly: 2 Hz apart at the
+  bottom (37, 39, 41 … 49), widening all the way out to 15 kHz. So the readings are a table with one entry per
+  step rather than a formula. The three band defaults are where their names come from — and two of them are the
+  nearest rung rather than a round number, because the table has no step on exactly 1000 or 5000 Hz.</p>
+  <p>These three readings are offered to <em>any</em> knob, in Knob Settings and in the browser, not only to one
+  the wizard made. Nothing about them is EQ-specific once the scale is chosen. The main knob keeps the original
+  four, since it is a pass-through with no parameter behind it.</p>
+
+  <div class="note">
+    <p class="h">No picture</p>
+    <p>These get plain dials. None of Schwung's existing graphics describes a parametric band, and a curve
+    worth drawing would need every row of all three bands at once — more than a 128 × 64 screen has room for
+    beside eight knobs.</p>
+  </div>
+</section>
+
+<section id="settings-knob">
+  <h2>Knob settings</h2>
+  <p class="lede"><kbd>Jog Click</kbd>, the wheel to the knob, <kbd>Jog Click</kbd> again. Inside,
+  <kbd>Jog</kbd> moves between rows; <kbd>Jog Click</kbd> enters a row so the wheel changes its value, and
+  again to leave. Touching a different knob switches to editing that one.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Row</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>Name</strong></td><td>Opens the pad keyboard</td></tr>
+        <tr><td class="k"><strong>Connect</strong></td><td>What M8 parameter this knob stands for, shown in the header when you touch it. A dash means none is recorded. Opens the same lists as Add Knob.</td></tr>
+        <tr><td class="k"><strong>CC</strong></td><td>The CC it sends, 1–127</td></tr>
+        <tr><td class="k"><strong>Chan</strong></td><td><strong>Song</strong> follows the channel in Settings, whatever that is at the time; 1–16 pins this knob to its own — for a knob pointed at something that is not the M8</td></tr>
+        <tr><td class="k"><strong>Mode</strong></td><td><strong>Abs</strong> sends the value — the only mode the M8 understands. <strong>Rel</strong> sends the movement, for other gear on the wire</td></tr>
+        <tr><td class="k"><strong>Display</strong></td><td>0-127 · Hex · 0-1 · -1..1. Changing it across the hex boundary re-expresses the position rather than keeping the number</td></tr>
+        <tr><td class="k"><strong>LED</strong></td><td><strong>Song</strong> follows the sweep in Settings; or name one for this knob alone. The device lists them short — <strong>Grey</strong>, <strong>Syn</strong>, <strong>Rose</strong>, <strong>Rain</strong>, <strong>Off</strong></td></tr>
+        <tr><td class="k"><strong>Speed</strong></td><td>1/4x · 1/3x · 1/2x · 1x · 2x — how far one detent moves it</td></tr>
+        <tr><td class="k"><strong>Min</strong> · <strong>Max</strong></td><td>The ends of its travel. Shift+jog moves them by eight</td></tr>
+        <tr><td class="k"><strong>Slot</strong></td><td>Move it to another slot, swapping with whatever is there</td></tr>
+        <tr><td class="k"><strong>Remove Knob</strong></td><td>Clears this slot. Others stay where they are</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note warn">
+    <p class="h">Relative is not for the M8</p>
+    <p>The M8 has no relative CC: its learn system maps a CC to a parameter and reads the value
+    <em>absolutely</em>, so a knob left on <strong>Rel</strong> does nothing there. The mode exists because
+    these CCs go out on an ordinary MIDI channel and can drive <strong>other gear</strong> on the same wire,
+    some of which would rather have an encoder's movement than its position. Leave it on <strong>Abs</strong>
+    for anything aimed at the M8 — which is what it defaults to.</p>
+  </div>
+
+  <p><strong>Connect keeps the slot and the CC</strong> — the CC is what the M8 has been taught, so changing it
+  would silently unlearn the mapping — and replaces the name, the starting value and the picture. A knob that
+  is part of a graphic connects the <em>whole group</em>.</p>
+  <p>A knob in a graphic also <em>moves</em> as a whole group, and a group has to stay on one row, so a
+  four-knob envelope can only swap between the two rows.</p>
+</section>
+
+<section id="graphics">
+  <h2>Knob graphics</h2>
+  <p class="lede">Some choices add several knobs that share one picture instead of each drawing its own dial.
+  The picture needs its knobs side by side on <em>one</em> row, so it may start a new row or page.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Graphic</th><th>Knobs</th><th>Drawn as</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>Filter</strong></td><td class="num">2</td><td>The response curve, shaped by the type you pick</td></tr>
+        <tr><td class="k"><strong>Envelope (3)</strong></td><td class="num">3</td><td>Attack, hold, decay — the AHD, Drum and Trig shape</td></tr>
+        <tr><td class="k"><strong>Envelope (4)</strong></td><td class="num">4</td><td>Attack, decay, sustain, release</td></tr>
+        <tr><td class="k"><strong>LFO</strong></td><td class="num">2</td><td>The wave, at its rate and depth</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Remove knobs until only one is left and it goes back to being a dial. The type or wave is asked for once,
+  when the graphic is added, because it is a selector on the M8 and so cannot be mapped to a CC.</p>
+
+  <h3>LP&gt;HP — two corners, no resonance</h3>
+  <p>This filter type is the one place where the knob's label and the M8's parameter are different words:</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Knob</th><th>M8 parameter</th><th>Controls</th><th>Off at</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>LP</strong> <span class="tag move">first</span></td><td class="num">CUT</td><td>The lowpass corner</td><td class="num">FF</td></tr>
+        <tr><td class="k"><strong>HP</strong> <span class="tag move">second</span></td><td class="num">RES</td><td>The highpass corner</td><td class="num">00</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Both are open at their defaults, and either one squeezes the band from its own side.
+  <span class="hx">CUT&nbsp;00</span> with <span class="hx">RES&nbsp;FF</span> closes it completely.</p>
+
+  <div class="note warn">
+    <p class="h">Learn these two in the order the M8 lists them</p>
+    <p>The pair is <strong>LP then HP</strong>, matching the M8's own screen (CUT above RES), so walking down
+    that screen assigning each row to the next knob lands each one correctly. Map them the other way round and
+    every picture is inverted — a full band where the filter is shut, and nothing where it is wide open.</p>
+    <p>Touch either knob to check: the header reads <code>Ins02 LP (CUT)</code> or <code>Ins02 HP (RES)</code>.</p>
+  </div>
+</section>
+
+<section id="settings">
+  <h2>The Settings menu</h2>
+  <p class="lede"><strong><kbd>Shift</kbd>+step 2</strong> opens it, <kbd>Jog</kbd> moves
+  between rows, <kbd>Jog Click</kbd> enters a row so the wheel changes its value, and <kbd>Back</kbd> closes.
+  Everything here is <strong>global</strong> — not stored per song, and none of it belongs to a particular
+  knob.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Row</th><th>Default</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>Knob Chan</strong></td><td class="num">4</td><td>MIDI channel the eight song knobs send on. Must match the M8's CONTROL MAP CHANNEL</td></tr>
+        <tr><td class="k"><strong>Main Knob</strong></td><td class="num">—</td><td>A screen of its own for knob 9 — see below. The row shows its CC</td></tr>
+        <tr><td class="k"><strong>Knob LED</strong></td><td class="num">Grey</td><td>The colour sweep the lights under the knobs walk. Knob 9 has no light</td></tr>
+        <tr><td class="k"><strong>Odd Rows</strong></td><td class="num">Off</td><td>Adds the third pad view, in session mode</td></tr>
+        <tr><td class="k"><strong>Exit Module</strong></td><td class="num">—</td><td>Leaves the module and returns to Move. An action, not a value: one click and you are out</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>The same settings in a browser</h3>
+  <p>Every row here except Songs and Exit is also on <strong>Schwung Manager's web UI</strong>, under
+  Modules → M8 LPP Emulator → Settings. The manager writes what you choose into a file beside the module and
+  never talks to the running module directly, so the module reads that file at startup, watches it while
+  running, and writes its own changes back to it. A change made in the browser reaches the device within a
+  couple of seconds, and a change made on the device shows up in the browser on its next load. Last one wins,
+  which for one person at one device and one browser is what you would expect.</p>
+  <p>Exit stays on the device — there is nothing to leave from a browser. <strong>Songs have a page of their
+  own</strong>, described under Managing songs.</p>
+
+  <p><strong>Exit Module</strong> is one of two ways out. Schwung's own is to hold <kbd>Shift</kbd> and touch
+  the <strong>volume knob</strong> and the <strong>jogwheel</strong>, which works from anywhere but takes
+  three hands; this row does the same thing from the screen you are already on, saving any pending edit as it
+  goes. (<kbd>Shift</kbd>+<strong>step 13</strong> is the way <em>into</em> the Tools menu, not the way out
+  of a module.)</p>
+  <h3>Main Knob</h3>
+  <p>Knob 9 belongs to no song, so its four settings are a screen of their own rather than four rows of the
+  main list. <kbd>Back</kbd> returns to Settings.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Row</th><th>Default</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><strong>CC</strong></td><td class="num">79</td><td>The CC it sends</td></tr>
+        <tr><td class="k"><strong>Chan</strong></td><td class="num">4</td><td>Its MIDI channel</td></tr>
+        <tr><td class="k"><strong>Mode</strong></td><td class="num">Abs</td><td>Absolute, or relative for gear that wants an encoder's movement. The M8 reads only absolute</td></tr>
+        <tr><td class="k"><strong>Display</strong></td><td class="num">Hex</td><td>How its value reads in the panel over the page: 0-127, Hex, 0-1 or -1..1 — the same four a song knob offers</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>Knob Chan is not a per-knob setting</strong> — it is the one channel all eight song knobs send
+  on. A knob's own CC, mode and display are in Knob settings, behind the knob cursor.</p>
+</section>
+
+<section id="songmgmt">
+  <h2>Managing songs</h2>
+  <p class="lede"><strong><kbd>Shift</kbd>+step 1</strong>. The first row is <strong>+ Add Song</strong>; the
+  rest are your songs in preset-button order, with <code>*</code> on the active one.</p>
+  <p>This and Settings are siblings, each with its own way in, so <strong><kbd>Back</kbd> leaves the menus
+  entirely</strong> rather than stepping up into the other — there is no "up" for it to go to.</p>
+  <p><strong>The two shortcuts work from anywhere, each other included.</strong> <kbd>Shift</kbd>+step 1 reaches
+  Songs and <kbd>Shift</kbd>+step 2 reaches Settings wherever you are — from the knob page, from the knob cursor,
+  and from inside the other menu — so you can cross straight between them without backing out first. Pressing the
+  shortcut for the screen you are already on does nothing.</p>
+  <p><strong>Holding <kbd>Shift</kbd> lights the small lamp beneath step 1</strong>, so the shortcut shows
+  itself rather than being something you have to remember. Beneath, not the step button: the little lights under
+  the step row are a separate set from the buttons above them — the same numbers, different lamps, which is why
+  the M8's Launchpad logo is the one under step 16 rather than step 16 itself. Nothing else uses this one, so it
+  is free to borrow and nothing has to be handed back. Step 2 needs no hint at all: it is already lit as a song
+  preset.</p>
+  <p>The two rows are different kinds of light, too. The step buttons are <strong>RGB</strong> and read their
+  byte as a colour; the lamps beneath them are <strong>white</strong> and read the same byte as a brightness. So
+  a value that means a colour up top means "barely on" down below — which is worth knowing if you ever see one
+  of these lit so faintly it looks broken.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Gesture</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><kbd>Jog</kbd></td><td>Move the cursor</td></tr>
+        <tr><td class="k"><kbd>Jog Click</kbd> on a song</td><td>Switch to it and close</td></tr>
+        <tr><td class="k"><kbd>Jog Click</kbd> on + Add Song</td><td>New song, opens the name keyboard. The only way to make one: <kbd>Capture</kbd> belongs to the M8</td></tr>
+        <tr><td class="k"><kbd>Shift</kbd>+<kbd>Jog</kbd></td><td>Move the highlighted song up or down — this is how it changes preset button</td></tr>
+        <tr><td class="k"><kbd>Shift</kbd>+<kbd>Jog Click</kbd></td><td>Rename the highlighted song</td></tr>
+        <tr><td class="k"><kbd>Shift</kbd>+<kbd>Copy</kbd></td><td>Duplicate the highlighted song — every page and every knob — placed directly below it</td></tr>
+        <tr><td class="k"><kbd>Shift</kbd>+<kbd>Delete</kbd></td><td>Delete the highlighted song. <strong>Asks first</strong>, and the last song cannot be deleted</td></tr>
+        <tr><td class="k"><kbd>Back</kbd></td><td>Close — out of the menus, not up into Settings</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Duplicating and deleting</h3>
+  <p><kbd>Shift</kbd>+<kbd>Copy</kbd> duplicates the highlighted song whole — every page, every
+  knob, and every setting on every knob. The copy lands <strong>directly below</strong> the original rather than
+  at the end of the list, because list order is also preset-button order and a duplicate is nearly always wanted
+  beside the thing it came from. Its name gets a number: <code>My Song</code> becomes <code>My Song 2</code>,
+  then <code>My Song 3</code>, counting up until it finds one that is free.</p>
+  <p><kbd>Shift</kbd>+<kbd>Delete</kbd> <strong>asks before it acts</strong>. A song is every page of knobs on it and the button
+  is one press with nothing held, so it opens a two-row question — <em>Cancel</em> and <em>Delete</em> — with the
+  cursor parked on <strong>Cancel</strong>. Clicking straight through therefore keeps the song; deleting takes a
+  deliberate move onto the other row. <kbd>Back</kbd>, or <kbd>Delete</kbd> again, backs out.</p>
+  <p><strong>Both take <kbd>Shift</kbd>, and both light while it is held</strong> — the same grip and the same
+  signal as on the knob cursor, so one pair of gestures does the same two jobs to whatever the cursor is on,
+  whether that is a song or a knob. On <strong>+ Add Song</strong> they stay dark: there is nothing there to
+  copy or remove.</p>
+  <p><strong>The M8 keeps working while either menu is open.</strong> The pads,
+  the transport, the mode buttons and the knobs all carry on doing what they normally do and still reach the M8 —
+  only the <strong>jogwheel</strong>, <strong><kbd>Back</kbd></strong> and the screen's own <kbd>Shift</kbd>
+  gestures belong to the menu, so you can open one without the M8 going deaf.</p>
+  <p>Every gesture this screen owns sits behind <kbd>Shift</kbd> — rename on <kbd>Shift</kbd>+<kbd>Jog
+  Click</kbd>, duplicate and delete on the two buttons, reorder on <kbd>Shift</kbd>+<kbd>Jog</kbd>. <kbd>Menu</kbd>
+  and <kbd>Capture</kbd> are left alone: they are the Launchpad's Note and Sequencer and belong to the M8.</p>
+  <p><strong>The last song cannot be deleted.</strong> Press Delete on it and the screen says so rather than
+  offering a choice that would be refused — there is always at least one song.</p>
+
+  <h3>Or from a browser</h3>
+  <p>The song bank has its own page in Schwung's web UI: <strong>Modules → M8 LPP Emulator → Open web
+  UI</strong>, or directly at <code>/api/remote-ui/module-assets/m8/web_ui.html</code> on the Move. Add,
+  rename, reorder and delete songs, and choose which one is active. Position in the list is the preset step
+  that recalls a song, so moving a song up or down there is the same act as moving it on the device.</p>
+  <p><strong>Knobs too.</strong> Open a song and each page lists the slots that hold a knob — the name, the
+  CC, the send mode, the value display, the LED sweep, the speed and the min/max ends are all editable, and a knob can be
+  removed or moved between slots. Each page ends with a tile for its next free slot; when every page is full, a last tile starts
+  another page. The slot number stays on each card, because that is which encoder it sits under. Two things stay on the Move, because both come from the catalogue and the geometry
+  the module enforces — a knob's <em>connection</em>, and the <em>picture</em> a group of knobs draws. Both
+  are shown on the page and carried through untouched, and a knob that belongs to a picture is marked with
+  its role rather than offered move arrows.</p>
+  <p>A running module notices within a couple of seconds and reloads. Two things hold it off: a screen open
+  on the device — the cursor is not pulled out from under you — and unsaved edits made on the Move, which are
+  written out first and win. Both resolve on the next check.</p>
+  <p><strong>Knobs stay on the device.</strong> The page moves whole songs and their knobs travel with them;
+  adding and editing a knob is the wizard's job.</p>
+</section>
+
+<section id="presets">
+  <h2>Song presets</h2>
+  <p class="lede">The eight step buttons the M8 does not use — the alternate ones, between the steps it
+  lights — switch songs with a single press.</p>
+  <p>The first eight songs occupy them in list order. To move a song to a different button, reorder the list.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>LED</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Amber</td><td>The song you are on</td></tr>
+        <tr><td class="k">Ochre</td><td>A song is on that button</td></tr>
+        <tr><td class="k">Dark</td><td>Nothing there</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Amber rather than white, because the row sits directly under the track buttons and the M8 paints those
+  white and grey — two rows of the same two colours told you nothing about which was which.</p>
+</section>
+
+<section id="trouble">
+  <h2>Troubleshooting</h2>
+
+  <h3>Nothing on the pads at all</h3>
+  <p>Check <strong>CTRL SURFACE</strong> is set to “Launchpad Pro” in the M8's MIDI settings. If it is, restart
+  the M8 — that has fixed a dead grid outright more than once.</p>
+
+  <h3>Reopened the module and the lights are wrong</h3>
+  <p>The module <strong>remembers the screen</strong>. On the way out it
+  writes down every lit pad, <em>and</em> which mode you were on and which half you were showing — including the
+  half each other mode was left on. On the way back in it puts all of that back, so what you return to is what
+  you left, right down to the pad colours.</p>
+  <p>The screen has to travel with the pads rather than being a nicety on top of them: the lit set is stored by
+  Launchpad note, and which Move pad a note paints depends on the half, so restoring the colours without the
+  view would paint them onto the wrong pads. The mode matters for the same reason, and because whether odd rows
+  is offered at all, and which of the three mode buttons lights, are both read off it.</p>
+  <p>It has to, because nothing else will. Leaving the module and coming back does not make the M8 repaint:
+  nothing in the MIDI protocol says "a Launchpad has just arrived" from this side — a real one is noticed because
+  its USB device appears — so the M8 carries on believing it already painted everything, while the Move has been
+  cleared to black underneath it.</p>
+  <p>The same memory covers the other way the pads get taken away: when Move's own keyboard borrows them for
+  naming a song, the grid is put back from memory as soon as it hands them over, rather than staying dark until
+  something else repaints it.</p>
+  <p><strong>Nothing is said to the M8 on the way back in.</strong> The announcement that normally introduces the
+  module is held back when there is a screen to restore, because the M8 answers it by initialising the surface
+  from scratch — landing on Session and repainting, which is the very thing the restore is there to avoid.</p>
+  <p><strong>A remembered screen goes stale after two minutes.</strong> Restoring one means taking it on trust
+  that the M8 is still there and still on it — which is fair for a trip out to the Tools menu and back, and
+  wrong after the Move has been sitting switched off or with the M8 unplugged. When it is wrong the cost is the
+  worst kind: a grid full of old LEDs that looks live while nothing is connected. So the snapshot carries its
+  age, and past two minutes it is ignored whole — no pads, no mode, no half — and the module introduces itself
+  and shows <strong>Waiting for M8…</strong> exactly as on a first run.</p>
+  <p>There is no way to simply ask. A connected M8 sitting idle sends nothing at all, so silence cannot tell
+  "here and quiet" apart from "gone", and waiting a moment to see would answer the wrong question. The clock is
+  the only signal available.</p>
+  <p>Two things are left out of the restore on purpose. An <strong>odd-rows</strong> view is dropped back to the
+  top half if Odd Rows has been switched off while you were away — from the browser, even — so the pads are not
+  stranded on a layout the cycle cannot reach. And the restored screen is only a <em>belief</em> about
+  where the M8 is: if the M8 moved on its own while the module was closed, the first mode button you press
+  resyncs it, because that forgets the grid and lets the M8 repaint.</p>
+  <p><strong>A mode change is deliberately left to the M8.</strong> Press Session, Note or Sequencer and the
+  module forgets the grid rather than replaying it — the remembered pads belong to the screen you are leaving,
+  and the M8 repaints for a screen change anyway, so replaying them would put the old screen up for the moment
+  it takes the new ones to arrive. The pads go dark and fill in with what is actually there. Switching
+  <em>halves</em> is not a mode change and keeps its memory, because the M8 sends nothing for that and the
+  memory is all there is.</p>
+  <p>A handful of lights are painted only when the M8 first initialises a Launchpad and are not part of any
+  screen repaint, so no memory on this side can recover them — <kbd>Play</kbd>, <kbd>Rec</kbd> and the
+  <kbd>Up</kbd> <kbd>Down</kbd> arrows. If those are the ones that look wrong:</p>
+  <ul class="plain">
+    <li><span class="tag m8">M8</span> In <strong>MIDI Settings</strong>, set <strong>CTRL SURFACE</strong>
+      away from “Launchpad Pro” and back again. The M8 initialises the surface from scratch, which repaints
+      the lot.</li>
+    <li>Or restart the M8, which does the same thing the long way round.</li>
+  </ul>
+
+  <h3>A pad or two is dark that ought to be lit</h3>
+  <p>Most often after reopening, sometimes after changing view: one pad in an otherwise full row is out, and it
+  is a different pad next time. <strong>The module was never told about it.</strong></p>
+  <p>The M8 sends <em>changes</em>, not the grid. It paints a screen once and afterwards mentions only what
+  moved, so the module's picture of the grid is only ever the sum of what it has been told — and on a mode
+  change it deliberately forgets that picture, because the colours belong to the screen being left. Any pad the
+  M8 has not mentioned since is a hole, and a hole paints as dark. Reopening cannot help: what is restored is
+  the same picture, holes included.</p>
+  <p>Measured on the wire, to give a sense of the scale of it: reopening the module produced <strong>one</strong>
+  LED message from the M8. Switching to Sequencer produced 20, and coming back to Session produced 38.</p>
+  <p><strong>The fix is to make the M8 repaint:</strong> press another mode button and press your way back.
+  A screen change is the one thing it always repaints for. It does not always fill every hole, because that
+  repaint is itself only the changes the M8 believes it needs to send — and when it doesn't, re-picking
+  <strong>CTRL SURFACE</strong> on the M8 initialises the surface from scratch and paints the lot.</p>
+  <p>This is worth knowing rather than worth fixing. The only thing that reliably produces a complete grid is
+  that from-scratch initialisation, and it lands the M8 back on Session — so buying a complete grid
+  automatically would cost you the screen you were on, every single time you opened the module.</p>
+
+  <h3>The pads work but the knobs do nothing</h3>
+  <p>The channels disagree. <strong>Knob Chan</strong> in Settings and <strong>CONTROL MAP CHANNEL</strong> on the
+  M8 both default to <span class="hx">4</span>; set them to the same thing. If the channel is right, the
+  parameter has not been learned yet — cursor on it, hold <kbd class="m8">OPTION</kbd>, turn the knob.</p>
+
+  <h3>A filter or envelope picture moves the wrong way</h3>
+  <p>Almost always the two knobs are learned to each other's parameters. A swap turns a wide-open band into a
+  closed one and back, so it looks exactly like the drawing is mirrored. Touch each knob and read what the
+  header says it should be, then re-learn on the M8 — or swap the two CC numbers in Knob Settings, which leaves
+  the M8 untouched.</p>
+
+  <h3>A knob's header names the wrong instrument</h3>
+  <p>Knobs made before the connection was recorded, or added through Generic, derive their description from
+  their name — which can name the parameter but never the instrument. Use <strong>Connect</strong> to record it
+  properly.</p>
+</section>
+
+<footer>
+  <p>M8 LPP Emulator for Ableton Move, running under Schwung. Part one describes the M8's own Launchpad Pro
+  MK3 integration, which this module emulates — that feature and its original documentation are the work of
+  the M8 Launchpad integration's author, not of this project. Much of part one's detail — the fixed channels,
+  the pad colour key, the edit-mode gestures, the beat repeat rows and the sequencer layout — is drawn from
+  Grahack's <a href="https://github.com/Grahack/M8_LPP_recap">M8 LPP Recap</a>, re-expressed here in the
+  Move's own buttons. Values are hexadecimal throughout, as on the M8. A condensed version of part two is
+  built into the module itself, on the device at Global Settings → System → Module Help.</p>
+  <p>A few bottom-row pad presses on the grid diagram are still to be described.</p>
+</footer>
+
+</main>
+</div>
+</div>
+</body>
+</html>

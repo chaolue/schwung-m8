@@ -1,0 +1,94 @@
+{
+    "id": "m8",
+    "label": "M8 LPP Emulator",
+    "items": [
+        {
+            "key": "knob_channel",
+            "label": "Knob MIDI Channel",
+            "type": "int",
+            "min": 1,
+            "max": 16,
+            "default": 4,
+            "help": "Channel the eight song knobs send their CCs on. Must match CONTROL MAP CHANNEL in the M8's MIDI Settings or nothing they send is heard."
+        },
+        {
+            "key": "master_cc",
+            "label": "Main Knob CC",
+            "type": "int",
+            "min": 0,
+            "max": 127,
+            "default": 79,
+            "help": "The Main (volume) knob is a pass-through with its own CC, separate from the eight song knobs."
+        },
+        {
+            "key": "master_channel",
+            "label": "Main Knob MIDI Channel",
+            "type": "int",
+            "min": 1,
+            "max": 16,
+            "default": 4
+        },
+        {
+            "key": "master_mode",
+            "label": "Main Knob Send Mode",
+            "type": "enum",
+            "options": [
+                "Absolute",
+                "Relative"
+            ],
+            "values": [
+                "absolute",
+                "relative"
+            ],
+            "default": "absolute",
+            "help": "Absolute sends the knob's position and is the only mode the M8 reads - its learn system takes the value as sent. Relative sends the movement instead, for other gear sharing the MIDI wire."
+        },
+        {
+            "key": "master_display",
+            "label": "Main Knob Value Display",
+            "type": "enum",
+            "options": [
+                "0-127",
+                "Hex",
+                "0-1",
+                "-1..1"
+            ],
+            "values": [
+                "0-127",
+                "hex",
+                "0-1",
+                "-1..1"
+            ],
+            "default": "hex",
+            "help": "How the Main knob's value reads in the panel that appears over the knob page while it is moving."
+        },
+        {
+            "key": "odd_rows",
+            "label": "Odd Rows View",
+            "type": "bool",
+            "default": false,
+            "help": "Adds a third pad view on the M8's main Session screen showing every other row, so a whole phrase fits at half resolution."
+        },
+        {
+            "key": "knob_leds",
+            "label": "Knob LED Colours",
+            "type": "enum",
+            "options": [
+                "Neutral",
+                "Synthwave",
+                "Rose",
+                "Rainbow",
+                "Off"
+            ],
+            "values": [
+                "neutral",
+                "synthwave",
+                "rose",
+                "rainbow",
+                "off"
+            ],
+            "default": "neutral",
+            "help": "The colour sweep the light under each knob walks as its value moves, for every knob that does not name one of its own. The Main knob has no light of its own and is not affected."
+        }
+    ]
+}

@@ -1,12 +1,12 @@
 {
     "id": "m8",
     "name": "M8 LPP Emulator",
-    "version": "1.1.10",
+    "version": "1.2.0",
     "description": "Novation Launchpad Pro emulation for Dirtywave M8 with knob banks",
     "author": "bobbydigitales, chaolue, damian- (port: charlesvestal)",
     "license": "CC-BY-NC-SA-4.0",
     "ui": "ui.js",
-    "api_version": 1,
+    "api_version": 2,
     "component_type": "overtake",
     "capabilities": {
         "claims_master_knob": true,
