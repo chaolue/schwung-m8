@@ -11,39 +11,68 @@ A port of the original M8 LPP emulation for [Schwung](https://github.com/charles
 
 ## Features
 
-- Emulates Launchpad Pro MIDI protocol
-- Full pad matrix with velocity sensitivity
-- Compatible with M8's Launchpad Pro mode
+- **The Launchpad Pro MK3 integration**, emulated: the M8's session,
+  note, sequencer and beat-repeat screens on Move's pads, with its
+  colours, blinking and pulsing reproduced in software. Move shows half
+  of the 8×8 grid at a time; the mode button you are already on switches
+  halves, and each screen remembers its own.
+- **Named, CC-mapped knobs**, added one at a time from a catalogue of
+  M8's mixer, send-effect, per-instrument and EQ parameters. They read
+  in the M8's own units — hex, decibels, hertz, a Q number — and some
+  share a picture rather than each drawing a dial: a filter's response
+  curve, an envelope, an LFO at its rate and depth.
+- **Songs**: pages of knobs, switched from the eight step buttons the
+  M8 leaves alone, and editable from a browser as well as the device.
+- **The screen is remembered** across a reopen, so the pads come back
+  without asking the M8 to repaint.
 
-## Building
+## Building and testing
 
 ```bash
-./scripts/build.sh
+./scripts/test.sh       # the test suite
+./scripts/build.sh      # package into dist/
+./scripts/install.sh    # copy dist/ to the Move
 ```
+
+`install.sh` only copies `dist/`, so `build.sh` has to run first or it
+silently ships the previous package. The tests load the real `src/ui.js`
+in Node and drive it over MIDI — see [`tests/README.md`](tests/README.md)
+— and are the only thing that catches the temporal-dead-zone
+`ReferenceError` that `node --check` passes clean, so they are worth
+running before every deploy.
 
 ## Installation
 
 Via Module Store (recommended):
 - Launch Schwung → Module Store → Utilities → M8 LPP Emulator
 
-Manual installation:
-```bash
-./scripts/install.sh
-```
+Manual installation: `./scripts/build.sh && ./scripts/install.sh`.
 
 ## Usage
 
-1. Connect M8 to Move via USB-A port
-2. Launch M8 LPP Emulator module
-3. Configure M8 to use Launchpad Pro mode
+1. Connect the M8 to the Move's USB-A port — or an iPad running the M8
+   app to the **USB-C** port, where only "Ableton Move Standalone Port"
+   carries MIDI through to Schwung.
+2. On the M8, set **MIDI Settings → CTRL SURFACE** to "Launchpad Pro".
+3. Hold **Shift** and press **step 13** to open Schwung's Tools menu,
+   then pick the M8 module.
+
+On the module: **Jog Click** raises a cursor over the eight knobs,
+**Shift+step 1** opens the song list and **Shift+step 2** the settings.
+The bar along the bottom of the screen names the rest, and changes while
+Shift is held.
 
 ## Documentation
 
-Full documentation — the Launchpad Pro integration this module emulates, and
-the knobs, songs, graphics and web UI the Move adds — is
-[`docs/index.html`](docs/index.html): one self-contained page with no build
-step, ready to serve as a GitHub Pages site (Settings → Pages → Deploy from a
-branch → `main` → `/docs`).
+**[chaolue.github.io/schwung-m8](https://chaolue.github.io/schwung-m8/)** —
+the Launchpad Pro integration this module emulates, and the knobs, songs,
+graphics and web UI the Move adds.
+
+The source is [`docs/index.html`](docs/index.html), one self-contained page
+with no build step, served from `/docs` on `main`. Its screenshots are
+captured from the device rather than drawn — see
+[`scripts/capture-screen.py`](scripts/capture-screen.py) — so they cannot
+drift from the layout they document.
 
 A condensed version lives on the device itself, at Global Settings → System →
 Module Help.
