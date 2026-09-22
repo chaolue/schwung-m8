@@ -29,8 +29,9 @@ src/
   always shows the active song's current page (Schwung's own knob-page
   visuals, reused directly from `shared/param_pages/`); touching or turning
   a knob swaps its name for its live value, inverted.
-- Knobs are added one at a time through a wizard (Shift+touch an empty
-  slot) over a catalogue of M8's mixer, send-effect and per-instrument-type
+- Knobs are added one at a time through a wizard (jog click raises a
+  cursor over the eight slots; land on an empty one and click again)
+  over a catalogue of M8's mixer, send-effect and per-instrument-type
   parameters, which supplies the name, the M8 default value, and the next
   free CC. Pages are created and pruned automatically as knobs need them.
   **M8's MIDI mapping is a LEARN system** — nothing here addresses an M8
@@ -43,9 +44,12 @@ src/
   exception: its editor prints dB and Hz rather than hex, so there is no
   byte on the screenshot to copy and those defaults follow the
   catalogue's stated conventions instead.
-- Shift+Jog-click opens Song Management (browse/switch/create/rename/delete,
-  reusing `shared/menu_layout.mjs`'s list and `shared/text_entry.mjs`'s
-  keyboard).
+- Two global screens on the step row, reachable from anywhere:
+  **Shift+step 1** opens Song Management (browse/switch/create/rename/
+  duplicate/delete) and **Shift+step 2** opens Settings. Both reuse
+  `shared/menu_layout.mjs`'s list and `shared/text_entry.mjs`'s keyboard,
+  and both take only the jogwheel, Back and their own Shift gestures -
+  everything else falls through to the M8.
 - A 3-band parametric EQ catalogue: 128 numbered slots plus the main mix
   and the three sends, each with gain, frequency and Q per band, reading
   in the M8's own dB / Q / Hz. TYPE and MODE are deliberately absent —
